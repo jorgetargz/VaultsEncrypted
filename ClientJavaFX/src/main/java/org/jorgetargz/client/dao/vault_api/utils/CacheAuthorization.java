@@ -11,4 +11,5 @@ public class CacheAuthorization {
     private String user;
     private String password;
     private String jwtAuth;
+    private String certificateAuth;
 }

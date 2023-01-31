@@ -47,9 +47,8 @@ public class UsersDaoImpl implements UsersDao {
         try (Connection connection = dbConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.INSERT_LOGIN_QUERY)) {
             preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getRole());
-            preparedStatement.setString(4, user.getCertificate());
+            preparedStatement.setString(2, user.getRole());
+            preparedStatement.setString(3, user.getCertificate());
             preparedStatement.executeUpdate();
             return user;
         } catch (SQLException e) {
@@ -88,7 +87,6 @@ public class UsersDaoImpl implements UsersDao {
     private User getLoginFromResultSet(ResultSet resultSet) throws SQLException {
         return User.builder()
                 .username(resultSet.getString(Constantes.USERNAME))
-                .password(resultSet.getString(Constantes.PASSWORD))
                 .role(resultSet.getString(Constantes.ROLE))
                 .certificate(resultSet.getString(Constantes.CERTIFICATE))
                 .build();

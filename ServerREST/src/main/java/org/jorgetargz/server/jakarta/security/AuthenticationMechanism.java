@@ -1,20 +1,23 @@
 package org.jorgetargz.server.jakarta.security;
 
+import com.nimbusds.jose.util.X509CertUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.security.enterprise.AuthenticationStatus;
 import jakarta.security.enterprise.authentication.mechanism.http.HttpAuthenticationMechanism;
 import jakarta.security.enterprise.authentication.mechanism.http.HttpMessageContext;
-import jakarta.security.enterprise.credential.BasicAuthenticationCredential;
 import jakarta.security.enterprise.identitystore.CredentialValidationResult;
-import jakarta.security.enterprise.identitystore.IdentityStore;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.extern.log4j.Log4j2;
+import org.jorgetargz.server.dao.excepciones.DatabaseException;
+import org.jorgetargz.server.dao.excepciones.NotFoundException;
 import org.jorgetargz.server.dao.excepciones.UnauthorizedException;
+import org.jorgetargz.server.domain.services.ServicesUsers;
+import org.jorgetargz.server.domain.services.excepciones.ValidationException;
 import org.jorgetargz.server.jakarta.common.Constantes;
+import org.jorgetargz.utils.modelo.User;
 import org.jose4j.jwa.AlgorithmConstraints;
 import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
@@ -26,6 +29,9 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.lang.JoseException;
 
+import java.security.*;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -34,15 +40,14 @@ import java.util.Set;
 public class AuthenticationMechanism implements HttpAuthenticationMechanism {
 
     private final RsaJsonWebKey rsaJsonWebKey;
-    private final IdentityStore identity;
     private final JWTBlackList jwtBlackList;
+    private final ServicesUsers servicesUsers;
 
     @Inject
-    public AuthenticationMechanism(@Named(Constantes.IDENTITY_STORE) IdentityStore identity,
-                                   RsaJsonWebKey rsaJsonWebKey, JWTBlackList jwtBlackList) {
+    public AuthenticationMechanism(RsaJsonWebKey rsaJsonWebKey, JWTBlackList jwtBlackList, ServicesUsers servicesUsers) {
         this.rsaJsonWebKey = rsaJsonWebKey;
-        this.identity = identity;
         this.jwtBlackList = jwtBlackList;
+        this.servicesUsers = servicesUsers;
     }
 
     @Override
@@ -58,20 +63,53 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
             if (headerFields.length == 2) {
                 String tipo = headerFields[0];
                 String valor = headerFields[1];
-                if (tipo.equals(Constantes.BASIC)) {
-                    credentialValidationResult = identity.validate(new BasicAuthenticationCredential(valor));
+                if (tipo.equals(Constantes.BEARER)) {
+                    credentialValidationResult = jwtAuthentication(httpServletResponse, valor);
+                } else if (tipo.equals(Constantes.CERTIFICATE)) {
+                    credentialValidationResult = certificateAuthentication(valor);
                     // Si el usuario es válido, se crea un JWT y se añade al header de la respuesta
                     if (credentialValidationResult.getStatus() == CredentialValidationResult.Status.VALID) {
                         httpServletResponse.addHeader(HttpHeaders.AUTHORIZATION,
                                 String.format(Constantes.BEARER_AUTH, createJWT(credentialValidationResult)));
                     }
-                } else if (tipo.equals(Constantes.BEARER)) {
-                    credentialValidationResult = jwtAuthentication(httpServletResponse, valor);
                 }
             }
         }
 
         return getAuthenticationStatus(httpServletRequest, httpMessageContext, credentialValidationResult);
+    }
+
+    private CredentialValidationResult certificateAuthentication(String valor) {
+        String[] authenticationFields = valor.split(":");
+        String username = authenticationFields[0];
+        String randomString = authenticationFields[1];
+        String signature = authenticationFields[2];
+        User user;
+        try {
+            user = servicesUsers.scGet(username);
+        } catch (ValidationException | DatabaseException | NotFoundException e) {
+            log.error(e.getMessage(), e);
+            return CredentialValidationResult.INVALID_RESULT;
+        }
+        if (user.getCertificate() == null) {
+            return CredentialValidationResult.INVALID_RESULT;
+        }
+        String certificateBase64 = user.getCertificate();
+        X509Certificate certificate = X509CertUtils.parse(Base64.getUrlDecoder().decode(certificateBase64));
+        PublicKey publicKey = certificate.getPublicKey();
+        // Se comprueba la firma del randomString con la clave pública del certificado
+        try {
+            Signature sign = Signature.getInstance("SHA256WithRSA");
+            sign.initVerify(publicKey);
+            sign.update(randomString.getBytes());
+            if (!sign.verify(Base64.getDecoder().decode(signature))) {
+                return CredentialValidationResult.INVALID_RESULT;
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            log.error(e.getMessage(), e);
+            return CredentialValidationResult.NOT_VALIDATED_RESULT;
+        }
+        return new CredentialValidationResult(user.getUsername(), Set.of(user.getRole()));
     }
 
     private String createJWT(CredentialValidationResult credentialValidationResult) {

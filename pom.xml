@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jorgetargz</groupId>
-    <artifactId>CajaFuerte</artifactId>
+    <artifactId>VaultsEncrypted</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>ServerREST</module>

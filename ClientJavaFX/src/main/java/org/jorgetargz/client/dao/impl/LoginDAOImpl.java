@@ -19,8 +19,8 @@ public class LoginDAOImpl extends GenericDAO implements LoginDAO {
     }
 
     @Override
-    public Single<Either<String, User>> getReaderByLogin(String authorization) {
-        return safeAPICall(loginAPI.getReaderByLogin(authorization));
+    public Single<Either<String, User>> login(String authorization) {
+        return safeAPICall(loginAPI.login(authorization));
     }
 
     @Override

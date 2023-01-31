@@ -2,7 +2,7 @@ package org.jorgetargz.server.dao.utils;
 
 public class SQLQueries {
 
-    public static final String INSERT_LOGIN_QUERY = "INSERT INTO login (username, password, role, certificate) VALUES (?, ?, ?, ?)";
+    public static final String INSERT_LOGIN_QUERY = "INSERT INTO login (username, role, certificate) VALUES (?, ?, ?)";
     public static final String SELECT_LOGIN_BY_USERNAME_QUERY = "SELECT * FROM login WHERE username = ?";
     public static final String DELETE_LOGIN_QUERY = "DELETE FROM login WHERE username = ?";
 

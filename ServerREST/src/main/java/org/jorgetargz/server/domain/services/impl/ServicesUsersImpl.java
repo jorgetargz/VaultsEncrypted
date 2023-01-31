@@ -1,6 +1,9 @@
 package org.jorgetargz.server.domain.services.impl;
 
 
+import jakarta.inject.Inject;
+import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
+import lombok.extern.log4j.Log4j2;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -10,18 +13,17 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.jorgetargz.security.EncriptacionAES;
 import org.jorgetargz.server.dao.UsersDao;
-import org.jorgetargz.server.dao.excepciones.UnauthorizedException;
 import org.jorgetargz.server.domain.common.Constantes;
 import org.jorgetargz.server.domain.services.ServicesUsers;
 import org.jorgetargz.server.domain.services.excepciones.ValidationException;
-import jakarta.inject.Inject;
 import org.jorgetargz.server.jakarta.security.JWTBlackList;
-import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
-import lombok.extern.log4j.Log4j2;
 import org.jorgetargz.utils.modelo.ContentCiphedAES;
 import org.jorgetargz.utils.modelo.User;
 
-import javax.crypto.*;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.*;
@@ -132,28 +134,17 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         }
 
         //Pasar el certificado a base64
+        String certificadoBase64;
         try {
-            String certificadoBase64 = Base64.getUrlEncoder().encodeToString(certificate.getEncoded());
-            user.setCertificate(certificadoBase64);
+            certificadoBase64 = Base64.getUrlEncoder().encodeToString(certificate.getEncoded());
         } catch (CertificateEncodingException e) {
             throw new RuntimeException(e);
         }
 
-        return daoLogin.save(user);
-    }
+        //Se guarda el certificado en base64 en el usuario para que se guarde en la base de datos
+        user.setCertificate(certificadoBase64);
 
-    @Override
-    public User scCheckCredentials(String username, char[] password) throws UnauthorizedException, ValidationException {
-        if (username == null || password == null) {
-            log.warn(Constantes.USERNAME_OR_PASSWORD_EMPTY);
-            throw new ValidationException(Constantes.USERNAME_OR_PASSWORD_EMPTY);
-        }
-        User userDB = daoLogin.get(username);
-        if (!passwordHash.verify(password, userDB.getPassword())) {
-            log.warn(Constantes.USERNAME_OR_PASSWORD_INCORRECT);
-            throw new UnauthorizedException(Constantes.USERNAME_OR_PASSWORD_INCORRECT);
-        }
-        return userDB;
+        return daoLogin.save(user);
     }
 
     @Override

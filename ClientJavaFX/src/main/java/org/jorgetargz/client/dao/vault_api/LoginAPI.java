@@ -11,9 +11,8 @@ import retrofit2.http.Header;
 public interface LoginAPI {
 
     @GET(ConstantesAPI.ENDPOINT_LOGIN)
-    Single<User> getReaderByLogin(@Header(Constantes.AUTHORIZATION) String authorization);
+    Single<User> login(@Header(Constantes.AUTHORIZATION) String authorization);
 
     @GET(ConstantesAPI.ENDPOINT_LOGOUT)
     Single<Response<Void>> logout(@Header(Constantes.AUTHORIZATION) String authorization);
-
 }

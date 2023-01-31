@@ -19,8 +19,8 @@ public class RSAKeyPairProducer {
     @Produces
     @Singleton
     public KeyPair getRsaKeyPair() {
-        Path privateKeyPath = Paths.get("privateKey");
-        Path publicKeyPath = Paths.get("publicKey");
+        Path privateKeyPath = Paths.get("privateKey.txt");
+        Path publicKeyPath = Paths.get("publicKey.txt");
         KeyPair keyPair;
 
         if (privateKeyPath.toFile().exists() && publicKeyPath.toFile().exists()) {
@@ -52,7 +52,7 @@ public class RSAKeyPairProducer {
         return keyPair;
     }
 
-    private static KeyPair createKeyPair(Path privateKeyPath, Path publicKeyPath) {
+    private KeyPair createKeyPair(Path privateKeyPath, Path publicKeyPath) {
         KeyPair keyPair;
         KeyPairGenerator generadorRSA4096;
         try {

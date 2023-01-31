@@ -11,4 +11,5 @@ module ServerRest {
     requires jakarta.jakartaee.web.api;
     requires org.bouncycastle.provider;
     requires org.bouncycastle.pkix;
+    requires com.nimbusds.jose.jwt;
 }

@@ -2,7 +2,7 @@ package org.jorgetargz.server.jakarta.common;
 
 public class Constantes {
 
-    public static final String IDENTITY_STORE = "IdentityStore";
+    public static final String CERTIFICATE = "Certificate";
 
     private Constantes() {
     }
@@ -17,7 +17,6 @@ public class Constantes {
 
     public static final int RSA_KEY_SIZE = 2048;
 
-    public static final String BASIC = "Basic";
     public static final String WHITE_SPACE = " ";
     public static final String ERROR_LOGIN = "LOGIN_ERROR";
     public static final String SERVER_ERROR = "Server error";
