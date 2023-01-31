@@ -1,0 +1,4 @@
+url: jdbc:mysql://dam2.mysql.iesquevedo.es:3335/JorgeMartinLlorente_Vault2?useSSL=false
+user: root
+password: quevedo2dam
+driver: com.mysql.cj.jdbc.Driver

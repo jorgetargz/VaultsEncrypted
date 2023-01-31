@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.font.MFXFontIcon?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefHeight="700.0" prefWidth="980.0"
+            xmlns="http://javafx.com/javafx/17" fx:controller="org.jorgetargz.client.gui.screens.main.MainController">
+    <top>
+        <HBox fx:id="windowHeader" alignment="CENTER_RIGHT" layoutY="6.0" prefHeight="50.0" prefWidth="1281.0"
+              spacing="10.0" styleClass="windowBar" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets right="10.0"/>
+            </padding>
+            <MenuBar id="menuBar" fx:id="menuPrincipal" prefHeight="24.0" prefWidth="681.0">
+                <HBox.margin>
+                    <Insets right="200.0" top="20.0"/>
+                </HBox.margin>
+                <Menu fx:id="menuSesion" mnemonicParsing="false" text="%Session">
+                    <MenuItem fx:id="menuItemPantallaInicio" mnemonicParsing="false" onAction="#menuOnClick"
+                              text="%Main"/>
+                    <MenuItem fx:id="menuItemLogout" mnemonicParsing="false" onAction="#logout" text="%CloseSession"/>
+                    <MenuItem fx:id="menuItemExit" mnemonicParsing="false" onAction="#exit" text="%Salir"/>
+                    <MenuItem fx:id="menuItemModoOscuro" mnemonicParsing="false" onAction="#cambiarcss"
+                              text="%ChangeTheme"/>
+                </Menu>
+                <Menu fx:id="menuUsers" mnemonicParsing="false" text="%Users">
+                    <MenuItem fx:id="menuItemUsersManagement" mnemonicParsing="false" onAction="#menuOnClick"
+                              text="%UsersManagement"/>
+                </Menu>
+                <Menu fx:id="menuVaults" mnemonicParsing="false" text="%Vaults">
+                    <MenuItem fx:id="menuItemVaultsManagement" mnemonicParsing="false" onAction="#menuOnClick"
+                              text="%VaultsManagement"/>
+                </Menu>
+                <Menu fx:id="menuHelp" mnemonicParsing="false" text="%Help">
+                    <MenuItem fx:id="menuItemAcercaDe" mnemonicParsing="false" onAction="#acercaDe" text="%About"/>
+                </Menu>
+            </MenuBar>
+            <MFXFontIcon fx:id="alwaysOnTopIcon" description="mfx-lock" size="21.0" styleClass="always-on-top-icon"/>
+            <MFXFontIcon fx:id="minimizeIcon" description="mfx-minus" size="20.0" styleClass="minimize-icon"/>
+            <MFXFontIcon fx:id="closeIcon" description="mfx-x-alt" size="20.0" styleClass="close-icon"/>
+        </HBox>
+    </top>
+</BorderPane>

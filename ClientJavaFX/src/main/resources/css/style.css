@@ -1,0 +1,108 @@
+.root {
+    -fx-background-color: #cce1f3;
+    -fx-background-radius: 10;
+    -fx-border-color: #ebebeb;
+    -fx-border-radius: 10;
+}
+
+/*Barra de navegacion*/
+.windowBar {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #ebebeb;
+    -fx-border-radius: 10;
+}
+
+.windowBar .close-icon {
+    -mfx-color: red;
+    -fx-opacity: 0.5;
+}
+
+.windowBar .close-icon:hover {
+    -fx-opacity: 1.0;
+}
+
+.windowBar .minimize-icon {
+    -mfx-color: #ffbf37;
+    -fx-opacity: 0.5;
+}
+
+.windowBar .minimize-icon:hover {
+    -fx-opacity: 1.0;
+}
+
+.windowBar .always-on-top-icon {
+    -mfx-color: purple;
+    -fx-opacity: 0.5;
+}
+
+.windowBar .always-on-top-icon:hover {
+    -fx-opacity: 1.0;
+}
+
+.windowBar .always-on-top-icon:always-on-top {
+    -fx-opacity: 1.0;
+}
+
+/*Menu*/
+.menu-bar {
+    -fx-background-color: white;
+    -fx-border: 0;
+}
+
+.menu-bar .menu-item {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+/*Labels*/
+.label {
+    -fx-font-size: 15;
+    -fx-font-family: "Comic Sans MS";
+}
+
+.bienvenida {
+    -fx-font-family: 'Grape Nuts', cursive;
+    -fx-font-size: 50px;
+    -fx-font-weight: bold;
+}
+
+.title {
+    -fx-font-family: 'Grape Nuts', cursive;
+    -fx-font-size: 30px;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-font-weight: bold;
+}
+
+#tituloLogin {
+    -fx-font-size: 55;
+    -fx-text-fill: #082D80;
+    -fx-font-family: "Bauhaus 93";
+}
+
+#infoLabel {
+    -fx-font-size: 20;
+    -fx-font-family: "Comic Sans MS";
+}
+
+/*Botones*/
+.mfx-button {
+    -fx-font-family: Consolas;
+    -fx-font-size: 16px;
+}
+
+.mfx-button:hover {
+    -fx-background-color: #ada9c7
+}
+
+/*Tablas*/
+.mfx-table-view {
+    -fx-font-family: Calibri;
+    -fx-font-size: 17px;
+    -fx-background-color: #5ba3c2;
+}
+
+.mfx-table-view .virtual-flow {
+    -fx-background-color: #b1dcee;
+}

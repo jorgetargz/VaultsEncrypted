@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="650.0" prefWidth="980.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jorgetargz.client.gui.screens.vault.VaultController">
+
+    <TableView fx:id="tableMessages" layoutX="42.0" layoutY="54.0" prefHeight="282.0" prefWidth="922.0">
+        <columns>
+            <TableColumn fx:id="columnId" prefWidth="104.0" text="%ID" />
+            <TableColumn fx:id="columnContent" prefWidth="798.0" text="%Content" />
+        </columns>
+    </TableView>
+   <MFXTextField fx:id="txtMessageSave" layoutX="42.0" layoutY="365.0" prefHeight="67.0" prefWidth="658.0" />
+   <MFXButton layoutX="720.0" layoutY="365.0" onAction="#saveMessage" prefHeight="67.0" prefWidth="213.0" text="%Save" />
+   <MFXTextField fx:id="txtMessageUpdate" layoutX="45.0" layoutY="456.0" prefHeight="67.0" prefWidth="658.0" />
+   <MFXButton layoutX="720.0" layoutY="456.0" onAction="#updateMessage" prefHeight="67.0" prefWidth="213.0" text="%Update" />
+   <MFXComboBox fx:id="cmbMessages" layoutX="45.0" layoutY="544.0" prefHeight="55.0" prefWidth="136.0" />
+   <MFXButton layoutX="205.0" layoutY="544.0" onAction="#deleteMessage" prefHeight="55.0" prefWidth="213.0" text="%Delete" />
+
+</AnchorPane>

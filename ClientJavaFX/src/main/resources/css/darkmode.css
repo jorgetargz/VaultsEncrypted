@@ -1,0 +1,65 @@
+@import "style.css";
+
+.root {
+    -fx-background-color: #2B2B2B;
+    -fx-border-color: #332e2e;
+    -fx-color: #ffffff;
+}
+
+/*Barra de navegacion*/
+.windowBar {
+    -fx-background-color: #5C6164;
+    -fx-border-color: #332e2e;
+    -fx-color: #ffffff;
+}
+
+.windowBar .always-on-top-icon:hover {
+    -mfx-color: white;
+}
+
+.windowBar .close-icon:hover {
+    -mfx-color: white;
+}
+
+.windowBar .minimize-icon:hover {
+    -mfx-color: white;
+}
+
+
+/*Menu*/
+.menu-bar {
+    -fx-background-color: #5C6164;
+    -fx-color: #ffffff;
+}
+
+.menu-bar .menu-item {
+    -fx-background-color: #5C6164;
+    -fx-border-color: #332e2e;
+    -fx-color: #ffffff;
+}
+
+.menu-bar .menu-item:hover {
+    -fx-background-color: #0096c9;
+    -fx-border-color: #332e2e;
+}
+
+/*Textos*/
+.label {
+    -fx-text-fill: #ffffff;
+}
+
+.table-view .label {
+    -fx-text-fill: #000000;
+}
+
+.mfx-list-view .label {
+    -fx-text-fill: #000000;
+}
+
+.mfx-combo-box .label {
+    -fx-text-fill: #000000;
+}
+
+.mfx-date-picker .label {
+    -fx-text-fill: #000000;
+}
