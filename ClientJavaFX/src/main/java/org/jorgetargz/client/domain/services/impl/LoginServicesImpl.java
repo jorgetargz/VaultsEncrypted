@@ -77,15 +77,17 @@ public class LoginServicesImpl implements LoginServices {
             throw new RuntimeException("Error al firmar el String aleatorio");
         }
 
-        //Se codifica la firma en base64
+        //Se codifica en Base64
+        String usernameBase64 = Base64.getEncoder().encodeToString(username.getBytes());
         String signatureBase64 = Base64.getEncoder().encodeToString(signature);
+        String randomStringBase64 = Base64.getEncoder().encodeToString(randomString.getBytes());
 
         //Se envía el String aleatorio y la firma codificada en base64 al servidor
         //para que valide la firma y devuelva el token
         String authorization = "Certificate " +
-                username +
+                usernameBase64 +
                 ":" +
-                randomString +
+                randomStringBase64 +
                 ":" +
                 signatureBase64;
         cache.setCertificateAuth(authorization);

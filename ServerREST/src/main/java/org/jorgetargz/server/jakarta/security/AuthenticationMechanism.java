@@ -19,7 +19,6 @@ import org.jorgetargz.server.domain.services.excepciones.ValidationException;
 import org.jorgetargz.server.jakarta.common.Constantes;
 import org.jorgetargz.utils.modelo.User;
 import org.jose4j.jwa.AlgorithmConstraints;
-import org.jose4j.jwk.RsaJsonWebKey;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
@@ -39,13 +38,13 @@ import java.util.Set;
 @ApplicationScoped
 public class AuthenticationMechanism implements HttpAuthenticationMechanism {
 
-    private final RsaJsonWebKey rsaJsonWebKey;
+    private final KeyPair keyPair;
     private final JWTBlackList jwtBlackList;
     private final ServicesUsers servicesUsers;
 
     @Inject
-    public AuthenticationMechanism(RsaJsonWebKey rsaJsonWebKey, JWTBlackList jwtBlackList, ServicesUsers servicesUsers) {
-        this.rsaJsonWebKey = rsaJsonWebKey;
+    public AuthenticationMechanism(KeyPair keyPair, JWTBlackList jwtBlackList, ServicesUsers servicesUsers) {
+        this.keyPair = keyPair;
         this.jwtBlackList = jwtBlackList;
         this.servicesUsers = servicesUsers;
     }
@@ -67,7 +66,7 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
                     credentialValidationResult = jwtAuthentication(httpServletResponse, valor);
                 } else if (tipo.equals(Constantes.CERTIFICATE)) {
                     credentialValidationResult = certificateAuthentication(valor);
-                    // Si el usuario es válido, se crea un JWT y se añade al header de la respuesta
+                    // Si la firma es válida, se crea un JWT y se añade al header de la respuesta
                     if (credentialValidationResult.getStatus() == CredentialValidationResult.Status.VALID) {
                         httpServletResponse.addHeader(HttpHeaders.AUTHORIZATION,
                                 String.format(Constantes.BEARER_AUTH, createJWT(credentialValidationResult)));
@@ -81,9 +80,13 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
 
     private CredentialValidationResult certificateAuthentication(String valor) {
         String[] authenticationFields = valor.split(":");
-        String username = authenticationFields[0];
-        String randomString = authenticationFields[1];
-        String signature = authenticationFields[2];
+        String usernameBase64 = authenticationFields[0];
+        String randomStringBase64 = authenticationFields[1];
+        String signatureBase64 = authenticationFields[2];
+
+        String username = new String(Base64.getDecoder().decode(usernameBase64));
+        byte[] randomString = Base64.getDecoder().decode(randomStringBase64);
+        byte[] signature = Base64.getDecoder().decode(signatureBase64);
         User user;
         try {
             user = servicesUsers.scGet(username);
@@ -101,8 +104,8 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
         try {
             Signature sign = Signature.getInstance("SHA256WithRSA");
             sign.initVerify(publicKey);
-            sign.update(randomString.getBytes());
-            if (!sign.verify(Base64.getDecoder().decode(signature))) {
+            sign.update(randomString);
+            if (!sign.verify(signature)) {
                 return CredentialValidationResult.INVALID_RESULT;
             }
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
@@ -129,8 +132,7 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
 
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
-        jws.setKey(rsaJsonWebKey.getPrivateKey());
-        jws.setKeyIdHeaderValue(rsaJsonWebKey.getKeyId());
+        jws.setKey(keyPair.getPrivate());
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
         try {
             return jws.getCompactSerialization();
@@ -167,7 +169,7 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
                 .setRequireSubject()
                 .setExpectedIssuer(Constantes.NEWSPAPERS_API)
                 .setExpectedAudience(Constantes.CLIENTS)
-                .setVerificationKey(rsaJsonWebKey.getKey())
+                .setVerificationKey(keyPair.getPublic())
                 .setJwsAlgorithmConstraints(
                         AlgorithmConstraints.ConstraintType.PERMIT, AlgorithmIdentifiers.RSA_USING_SHA256)
                 .build();
