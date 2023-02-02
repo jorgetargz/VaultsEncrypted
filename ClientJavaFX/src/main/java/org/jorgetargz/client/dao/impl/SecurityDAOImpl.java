@@ -7,8 +7,6 @@ import jakarta.inject.Inject;
 import org.jorgetargz.client.dao.SecurityDAO;
 import org.jorgetargz.client.dao.vault_api.SecurityAPI;
 
-import java.util.List;
-
 public class SecurityDAOImpl extends GenericDAO implements SecurityDAO {
 
     private final SecurityAPI securityAPI;
@@ -20,7 +18,7 @@ public class SecurityDAOImpl extends GenericDAO implements SecurityDAO {
     }
 
     @Override
-    public Single<Either<String, List<String>>> getPublicKey() {
+    public Single<Either<String, String>> getPublicKey() {
         return safeAPICall(securityAPI.getPublicKey());
     }
 }

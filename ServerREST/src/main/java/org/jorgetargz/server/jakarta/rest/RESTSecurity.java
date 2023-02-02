@@ -13,7 +13,6 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.List;
 
 @Path(ConstantesAPI.PATH_SECURITY)
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,10 +28,10 @@ public class RESTSecurity {
 
     @GET
     @Path(ConstantesAPI.PUBLIC_KEY_PATH)
-    public List<String> getPublicKey() {
+    public String getPublicKey() {
         PublicKey clavePublica = rsaKeyPair.getPublic();
         X509EncodedKeySpec x509Spec = new X509EncodedKeySpec(clavePublica.getEncoded());
-        return List.of(Base64.getEncoder().encodeToString(x509Spec.getEncoded()));
+        return Base64.getUrlEncoder().encodeToString(x509Spec.getEncoded());
     }
 
 }
