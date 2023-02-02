@@ -29,12 +29,11 @@ public class ProducerVaultAPI {
 
         return new Retrofit.Builder()
                 .baseUrl(configVaultAPI.getBaseUrl())
-                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(clientOK)
                 .build();
-
     }
 
     @Produces
