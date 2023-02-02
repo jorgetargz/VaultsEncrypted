@@ -9,8 +9,8 @@ public class SQLQueries {
     public static final String GET_VAULTS = "select * from vaults where username = ?";
     public static final String SELECT_VAULT_BY_ID = "SELECT * FROM vaults WHERE id = ?";
     public static final String SELECT_VAULT_BY_NAME = "SELECT * FROM vaults WHERE name = ? AND username = ?";
-    public static final String INSERT_VAULT_QUERY = "INSERT INTO vaults (name, username, password, `read`, `write`) VALUES (?, ?, ?, ?, ?)";
-    public static final String UPDATE_VAULT_PASSWORD_QUERY = "UPDATE vaults SET password = ? WHERE id = ?";
+    public static final String INSERT_VAULT_QUERY = "INSERT INTO vaults (name, username, `key`, `read`, `write`) VALUES (?, ?, ?, ?, ?)";
+    public static final String UPDATE_VAULT_KEY_QUERY = "UPDATE vaults SET key = ? WHERE id = ?";
     public static final String DELETE_VAULT_QUERY = "DELETE FROM vaults WHERE id = ?";
     public static final String DELETE_VAULTS_QUERY_BY_USERNAME = "DELETE FROM vaults WHERE username = ?";
 

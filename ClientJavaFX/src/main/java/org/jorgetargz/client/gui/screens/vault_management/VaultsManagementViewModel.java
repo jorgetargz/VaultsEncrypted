@@ -45,7 +45,7 @@ public class VaultsManagementViewModel {
     public void changePassword(Vault vault, String oldPassword, String newPassword) {
         if (vault != null && oldPassword != null && !oldPassword.isEmpty() && newPassword != null && !newPassword.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
-            vault.setPassword(oldPassword);
+            vault.setKey(oldPassword);
             vaultServices.changePassword(vault, newPassword)
                     .subscribeOn(Schedulers.single())
                     .subscribe(either -> {
@@ -86,7 +86,7 @@ public class VaultsManagementViewModel {
                                     .id(either.get().getId())
                                     .name(vault.getName())
                                     .usernameOwner(vault.getUsernameOwner())
-                                    .password(passwordText)
+                                    .key(passwordText)
                                     .build();
                             state.set(new VaultsManagementState(null, null, credential, false, false, true));
                         }
@@ -109,7 +109,7 @@ public class VaultsManagementViewModel {
                                     .id(either.get().getId())
                                     .name(nameVaultText)
                                     .usernameOwner(usernameOwnerText)
-                                    .password(passwordText)
+                                    .key(passwordText)
                                     .build();
                             state.set(new VaultsManagementState(null, null, credential, false, false, true));
                         }
@@ -119,17 +119,20 @@ public class VaultsManagementViewModel {
         }
     }
 
-    public void createVault(String username, String name, String password, boolean readByAll, boolean writeByAll) {
-        if (username != null && !username.isEmpty() && name != null && !name.isEmpty() && password != null && !password.isEmpty()) {
+    public void createVault(String username, String name, String password, boolean readByAll, boolean writeByAll, String userPassword) {
+        if (username != null && !username.isEmpty()
+                && name != null && !name.isEmpty()
+                && password != null && !password.isEmpty()
+                && userPassword != null && !userPassword.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
             Vault vault = Vault.builder()
                     .name(name)
                     .usernameOwner(username)
-                    .password(password)
+                    .key(password)
                     .readByAll(readByAll)
                     .writeByAll(writeByAll)
                     .build();
-            vaultServices.save(vault)
+            vaultServices.save(vault, userPassword)
                     .subscribeOn(Schedulers.single())
                     .subscribe(either -> {
                         if (either.isLeft())

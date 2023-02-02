@@ -41,17 +41,16 @@ public class ServicesVaultsImpl implements ServicesVaults {
 
     @Override
     public Vault createVault(Vault vault) {
-        vault.setPassword(passwordHash.generate(vault.getPassword().toCharArray()));
         return vaultsDao.createVault(vault);
     }
 
     @Override
     public Vault getVault(Vault credentials, String usernameReader) {
-        String password = new String(decoder.decode(credentials.getPassword()));
+        String password = new String(decoder.decode(credentials.getKey()));
         String username = new String(decoder.decode(credentials.getUsernameOwner()));
         String name = new String(decoder.decode(credentials.getName()));
         Vault vault = vaultsDao.getVault(username, name);
-        if (passwordHash.verify(password.toCharArray(), vault.getPassword())) {
+        if (passwordHash.verify(password.toCharArray(), vault.getKey())) {
             if (vault.getUsernameOwner().equals(usernameReader) || vault.isReadByAll()) {
                 return vault;
             } else {
@@ -67,12 +66,12 @@ public class ServicesVaultsImpl implements ServicesVaults {
         String newPassword = new String(Base64.getDecoder().decode(password));
         int vaultId = credentials.getId();
         Vault vault = vaultsDao.getVault(vaultId);
-        if (passwordHash.verify(credentials.getPassword().toCharArray(), vault.getPassword())
+        if (passwordHash.verify(credentials.getKey().toCharArray(), vault.getKey())
                 && vault.getUsernameOwner().equals(usernameReader)) {
 
             List<Message> messages = messageDao.getMessages(vaultId);
             for (Message message : messages) {
-                String messageText = encriptacionAES.desencriptar(message.getContentCiphedAES(), credentials.getPassword());
+                String messageText = encriptacionAES.desencriptar(message.getContentCiphedAES(), credentials.getKey());
                 ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(messageText, newPassword);
                 message.setContentCiphedAES(contentCiphedAES);
                 messageDao.updateMessage(message);

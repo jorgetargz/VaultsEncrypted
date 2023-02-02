@@ -27,7 +27,7 @@ public class VaultsViewModel {
 
     public void loadMessages(Vault credentials) {
         state.set(new VaultState(null, null, false, true, false));
-        messageServices.getAll(credentials.getName(), credentials.getUsernameOwner(), credentials.getPassword())
+        messageServices.getAll(credentials.getName(), credentials.getUsernameOwner(), credentials.getKey())
                 .subscribeOn(Schedulers.single())
                 .subscribe(either -> {
                     if (either.isLeft())
@@ -44,7 +44,7 @@ public class VaultsViewModel {
                     .contentUnsecured(content)
                     .build();
             state.set(new VaultState(null, null, false, true, false));
-            messageServices.save(message, vault.getPassword())
+            messageServices.save(message, vault.getKey())
                     .subscribeOn(Schedulers.single())
                     .subscribe(either -> {
                         if (either.isLeft())
@@ -63,7 +63,7 @@ public class VaultsViewModel {
         if (vault != null && message != null && newContent != null && !newContent.isEmpty()) {
             message.setContentUnsecured(newContent);
             state.set(new VaultState(null, null, false, true, false));
-            messageServices.update(message, vault.getPassword())
+            messageServices.update(message, vault.getKey())
                     .subscribeOn(Schedulers.single())
                     .subscribe(either -> {
                         if (either.isLeft())

@@ -42,7 +42,7 @@ public class RESTVault {
         Vault credentials = Vault.builder()
                 .name(vaultName)
                 .usernameOwner(usernameOwner)
-                .password(password)
+                .key(password)
                 .build();
         return servicesVaults.getVault(credentials, securityContext.getUserPrincipal().getName());
     }

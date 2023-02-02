@@ -85,7 +85,7 @@ public class VaultsDaoImpl implements VaultsDao {
                 .id(resultSet.getInt(Constantes.ID))
                 .name(resultSet.getString(Constantes.NAME))
                 .usernameOwner(resultSet.getString(Constantes.USERNAME))
-                .password(resultSet.getString(Constantes.PASSWORD))
+                .key(resultSet.getString(Constantes.KEY))
                 .readByAll(resultSet.getBoolean(Constantes.READ_BY_ALL))
                 .writeByAll(resultSet.getBoolean(Constantes.WRITE_BY_ALL))
                 .build();
@@ -97,7 +97,7 @@ public class VaultsDaoImpl implements VaultsDao {
              PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.INSERT_VAULT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, vault.getName());
             preparedStatement.setString(2, vault.getUsernameOwner());
-            preparedStatement.setString(3, vault.getPassword());
+            preparedStatement.setString(3, vault.getKey());
             preparedStatement.setInt(4, vault.isReadByAll() ? 1 : 0);
             preparedStatement.setInt(5, vault.isWriteByAll() ? 1 : 0);
             preparedStatement.executeUpdate();
@@ -117,7 +117,7 @@ public class VaultsDaoImpl implements VaultsDao {
     @Override
     public void changePassword(int vaultId, String newPassword) {
         try (Connection connection = dbConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.UPDATE_VAULT_PASSWORD_QUERY)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.UPDATE_VAULT_KEY_QUERY)) {
             preparedStatement.setString(1, newPassword);
             preparedStatement.setInt(2, vaultId);
             if (preparedStatement.executeUpdate() != 1) {
