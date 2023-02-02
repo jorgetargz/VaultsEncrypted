@@ -29,7 +29,7 @@ public class ServerPublicKeyProducer {
                     else {
                         // Se decodifica la clave pública del servidor
                         byte[] clavePublicaServidorBytes =
-                                Base64.getDecoder().decode(either.get().get(0));
+                                Base64.getUrlDecoder().decode(either.get());
 
                         // Se obtiene la clave pública del servidor
                         X509EncodedKeySpec clavePublicaServidorSpec = new X509EncodedKeySpec(clavePublicaServidorBytes);

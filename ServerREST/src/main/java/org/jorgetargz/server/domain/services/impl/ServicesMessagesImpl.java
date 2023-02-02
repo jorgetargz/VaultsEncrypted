@@ -25,16 +25,16 @@ public class ServicesMessagesImpl implements ServicesMessages {
         this.messageDao = messageDao;
         this.vaultsDao = vaultsDao;
         this.passwordHash = passwordHash;
-        this.decoder = Base64.getDecoder();
+        this.decoder = Base64.getUrlDecoder();
     }
 
     @Override
     public List<Message> getMessages(Vault credentials, String usernameReader) {
-        String password = new String(decoder.decode(credentials.getPassword()));
+        String password = new String(decoder.decode(credentials.getKey()));
         String username = new String(decoder.decode(credentials.getUsernameOwner()));
         String name = new String(decoder.decode(credentials.getName()));
         Vault vault = vaultsDao.getVault(username, name);
-        if (passwordHash.verify(password.toCharArray(), vault.getPassword())) {
+        if (passwordHash.verify(password.toCharArray(), vault.getKey())) {
             if (vault.getUsernameOwner().equals(usernameReader) || vault.isReadByAll()) {
                 return messageDao.getMessages(vault.getId());
             } else {
@@ -62,7 +62,7 @@ public class ServicesMessagesImpl implements ServicesMessages {
     }
 
     private void checkPermsionToWrite(Vault vault, String password, String usernameReader) {
-        if (passwordHash.verify(password.toCharArray(), vault.getPassword())) {
+        if (passwordHash.verify(password.toCharArray(), vault.getKey())) {
             if (!vault.getUsernameOwner().equals(usernameReader) && !vault.isWriteByAll()) {
                 throw new ValidationException(Constantes.ONLY_THE_OWNER_OF_THE_VAULT_CAN_WRITE_IN_IT);
             }

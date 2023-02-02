@@ -72,7 +72,7 @@ public class UsersServicesImpl implements UsersServices {
         String password = RandomStringUtils.randomAlphanumeric(16);
 
         //Se obtiene la clave pública del cliente en formato Base64
-        String clavePublicaClienteBase64 = Base64.getEncoder().encodeToString(x509Spec.getEncoded());
+        String clavePublicaClienteBase64 = Base64.getUrlEncoder().encodeToString(x509Spec.getEncoded());
 
         // Se encripta con AES la clave pública con la clave aleatoria
         ContentCiphedAES clavePublicaClienteEncriptada = encriptacionAES.encriptar(clavePublicaClienteBase64, password);
@@ -93,7 +93,7 @@ public class UsersServicesImpl implements UsersServices {
         }
 
         //Se almacena la clave aleatoria encriptada en el usuario codificada en Base64
-        user.setEncryptedPasswordOfPublicKeyEncrypted(Base64.getEncoder().encodeToString(passwordEncrypted));
+        user.setEncryptedPasswordOfPublicKeyEncrypted(Base64.getUrlEncoder().encodeToString(passwordEncrypted));
 
         // Se almacena el usuario en la base de datos y se obtiene el
         // usuario con un certificado firmado por el servidor
@@ -142,9 +142,7 @@ public class UsersServicesImpl implements UsersServices {
             throw new RuntimeException("No se ha podido guardar el certificado y la clave privada en el KeyStore");
         }
 
-        // Se guarda en el directorio del proyecto en el cliente problema en el servidor web no se puede guardar
-        // en el directorio del proyecto porque se pierde al reiniciar el servidor
-        // se ha de guardar en un directorio del container en el que el servidor web tenga permisos
+        // Se guarda el KeyStore en un fichero
         Path keystorePath = Paths.get(user.getUsername() + "KeyStore.pfx");
         try (OutputStream fos = Files.newOutputStream(keystorePath)) {
             //Se guarda el KeyStore en el fichero
@@ -157,7 +155,7 @@ public class UsersServicesImpl implements UsersServices {
 
     @Override
     public Single<Either<String, Boolean>> delete(String username) {
-        username = Base64.getEncoder().encodeToString(username.getBytes());
+        username = Base64.getUrlEncoder().encodeToString(username.getBytes());
         return usersDAO.delete(username);
     }
 }

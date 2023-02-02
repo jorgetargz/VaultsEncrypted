@@ -78,9 +78,9 @@ public class LoginServicesImpl implements LoginServices {
         }
 
         //Se codifica en Base64
-        String usernameBase64 = Base64.getEncoder().encodeToString(username.getBytes());
-        String signatureBase64 = Base64.getEncoder().encodeToString(signature);
-        String randomStringBase64 = Base64.getEncoder().encodeToString(randomString.getBytes());
+        String usernameBase64 = Base64.getUrlEncoder().encodeToString(username.getBytes());
+        String signatureBase64 = Base64.getUrlEncoder().encodeToString(signature);
+        String randomStringBase64 = Base64.getUrlEncoder().encodeToString(randomString.getBytes());
 
         //Se envía el String aleatorio y la firma codificada en base64 al servidor
         //para que valide la firma y devuelva el token

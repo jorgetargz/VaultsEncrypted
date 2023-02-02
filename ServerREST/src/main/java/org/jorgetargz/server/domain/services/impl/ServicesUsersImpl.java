@@ -74,7 +74,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         String passwordEncryptedBase64 = user.getEncryptedPasswordOfPublicKeyEncrypted();
 
         //Se decodifica la clave pública encriptada con Base64
-        byte[] passwordEncrypted = Base64.getDecoder().decode(passwordEncryptedBase64);
+        byte[] passwordEncrypted = Base64.getUrlDecoder().decode(passwordEncryptedBase64);
 
         //Se desencripta la contraseña con la clave privada del servidor
         byte[] passwordDecrypted;
@@ -92,7 +92,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         String publicKeyBase64 = encriptacionAES.desencriptar(publicKeyEncrypted, new String(passwordDecrypted));
 
         //Se decodifica la clave pública en Base64
-        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyBase64);
+        byte[] publicKeyBytes = Base64.getUrlDecoder().decode(publicKeyBase64);
 
         //Se crea un objeto PublicKey a partir de la clave pública
         X509EncodedKeySpec x509Spec = new X509EncodedKeySpec(publicKeyBytes);
@@ -158,7 +158,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
 
     @Override
     public void scDelete(String username) {
-        username = new String(Base64.getDecoder().decode(username));
+        username = new String(Base64.getUrlDecoder().decode(username));
         daoLogin.delete(username);
     }
 

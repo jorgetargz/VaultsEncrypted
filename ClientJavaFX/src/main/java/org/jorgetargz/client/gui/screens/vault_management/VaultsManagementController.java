@@ -117,7 +117,6 @@ public class VaultsManagementController extends BaseScreenController {
         String password = txtPasswordCreate.getText();
         boolean readByAllInput = this.readByAll.isSelected();
         boolean writeByAllInput = this.writeByAll.isSelected();
-        String userPassword = this.getPrincipalController().getUser().getPassword();
-        vaultsManagementViewModel.createVault(username, name, password, readByAllInput, writeByAllInput, userPassword);
+        vaultsManagementViewModel.createVault(username, name, password, readByAllInput, writeByAllInput);
     }
 }

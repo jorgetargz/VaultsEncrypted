@@ -31,7 +31,7 @@ public class ServicesVaultsImpl implements ServicesVaults {
         this.messageDao = messageDao;
         this.passwordHash = passwordHash;
         this.encriptacionAES = encriptacionAES;
-        this.decoder = Base64.getDecoder();
+        this.decoder = Base64.getUrlDecoder();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ServicesVaultsImpl implements ServicesVaults {
 
     @Override
     public void changePassword(Vault credentials, String password, String usernameReader) {
-        String newPassword = new String(Base64.getDecoder().decode(password));
+        String newPassword = new String(Base64.getUrlDecoder().decode(password));
         int vaultId = credentials.getId();
         Vault vault = vaultsDao.getVault(vaultId);
         if (passwordHash.verify(credentials.getKey().toCharArray(), vault.getKey())

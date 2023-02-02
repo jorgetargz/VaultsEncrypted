@@ -37,7 +37,7 @@ public class MessagesDaoImpl implements MessagesDao {
                         .id(resultSet.getInt(Constantes.ID))
                         .name(resultSet.getString(Constantes.NAME))
                         .usernameOwner(resultSet.getString(Constantes.USERNAME))
-                        .password(resultSet.getString(Constantes.PASSWORD))
+                        .key(resultSet.getString(Constantes.KEY))
                         .readByAll(resultSet.getBoolean(Constantes.READ_BY_ALL))
                         .writeByAll(resultSet.getBoolean(Constantes.WRITE_BY_ALL))
                         .build();

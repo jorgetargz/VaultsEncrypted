@@ -25,9 +25,9 @@ public class MessagesServicesImpl implements MessagesServices {
 
     @Override
     public Single<Either<String, List<Message>>> getAll(String vaultName, String username, String password) {
-        vaultName = Base64.getEncoder().encodeToString(vaultName.getBytes());
-        username = Base64.getEncoder().encodeToString(username.getBytes());
-        String passwordEncoded = Base64.getEncoder().encodeToString(password.getBytes());
+        vaultName = Base64.getUrlEncoder().encodeToString(vaultName.getBytes());
+        username = Base64.getUrlEncoder().encodeToString(username.getBytes());
+        String passwordEncoded = Base64.getUrlEncoder().encodeToString(password.getBytes());
         return messagesDAO.getAll(vaultName, username, passwordEncoded).map(either -> either.map(messages -> {
             messages.forEach(message ->
                     message.setContentUnsecured(encriptacionAES.desencriptar(message.getContentCiphedAES(), password)));
@@ -38,7 +38,7 @@ public class MessagesServicesImpl implements MessagesServices {
     @Override
     public Single<Either<String, Message>> save(Message message, String password) {
         ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(message.getContentUnsecured(), password);
-        password = Base64.getEncoder().encodeToString(password.getBytes());
+        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
         Message messageToSave = Message.builder()
                 .idVault(message.getIdVault())
                 .contentCiphedAES(contentCiphedAES)
@@ -49,7 +49,7 @@ public class MessagesServicesImpl implements MessagesServices {
     @Override
     public Single<Either<String, Message>> update(Message message, String password) {
         ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(message.getContentUnsecured(), password);
-        password = Base64.getEncoder().encodeToString(password.getBytes());
+        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
         Message messageToUpdate = Message.builder()
                 .id(message.getId())
                 .idVault(message.getIdVault())

@@ -84,9 +84,9 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
         String randomStringBase64 = authenticationFields[1];
         String signatureBase64 = authenticationFields[2];
 
-        String username = new String(Base64.getDecoder().decode(usernameBase64));
-        byte[] randomString = Base64.getDecoder().decode(randomStringBase64);
-        byte[] signature = Base64.getDecoder().decode(signatureBase64);
+        String username = new String(Base64.getUrlDecoder().decode(usernameBase64));
+        byte[] randomString = Base64.getUrlDecoder().decode(randomStringBase64);
+        byte[] signature = Base64.getUrlDecoder().decode(signatureBase64);
         User user;
         try {
             user = servicesUsers.scGet(username);

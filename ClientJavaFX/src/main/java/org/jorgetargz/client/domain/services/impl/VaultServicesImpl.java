@@ -39,9 +39,9 @@ public class VaultServicesImpl implements VaultServices {
 
     @Override
     public Single<Either<String, Vault>> get(String vaultName, String username, String password) {
-        vaultName = Base64.getEncoder().encodeToString(vaultName.getBytes());
-        username = Base64.getEncoder().encodeToString(username.getBytes());
-        password = Base64.getEncoder().encodeToString(password.getBytes());
+        vaultName = Base64.getUrlEncoder().encodeToString(vaultName.getBytes());
+        username = Base64.getUrlEncoder().encodeToString(username.getBytes());
+        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
         return vaultDAO.get(vaultName, username, password);
     }
 
@@ -91,7 +91,7 @@ public class VaultServicesImpl implements VaultServices {
             throw new RuntimeException("Error al encriptar la clave del vault con la clave privada");
         }
 
-        String vaultPasswordEncryptedBase64 = Base64.getEncoder().encodeToString(vaultPasswordEncryptedBytes);
+        String vaultPasswordEncryptedBase64 = Base64.getUrlEncoder().encodeToString(vaultPasswordEncryptedBytes);
 
         vault.setKey(vaultPasswordEncryptedBase64);
         return vaultDAO.save(vault);
@@ -99,7 +99,7 @@ public class VaultServicesImpl implements VaultServices {
 
     @Override
     public Single<Either<String, Boolean>> changePassword(Vault credentials, String password) {
-        password = Base64.getEncoder().encodeToString(password.getBytes());
+        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
         return vaultDAO.changePassword(credentials, password);
     }
 

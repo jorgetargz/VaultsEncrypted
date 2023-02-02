@@ -35,7 +35,7 @@ public class RESTMessages {
         Vault credentials = Vault.builder()
                 .name(vaultName)
                 .usernameOwner(usernameOwner)
-                .password(password)
+                .key(password)
                 .build();
         return servicesMessages.getMessages(credentials, securityContext.getUserPrincipal().getName());
     }
