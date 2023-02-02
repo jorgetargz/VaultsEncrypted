@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.services.VaultServices;
 import org.jorgetargz.client.gui.screens.common.ScreenConstants;
 import org.jorgetargz.utils.modelo.Vault;
@@ -12,11 +13,13 @@ import org.jorgetargz.utils.modelo.Vault;
 public class VaultsManagementViewModel {
 
     private final VaultServices vaultServices;
+    private final CacheAuthorization cacheAuthorization;
     private final ObjectProperty<VaultsManagementState> state;
 
     @Inject
-    public VaultsManagementViewModel(VaultServices vaultServices) {
+    public VaultsManagementViewModel(VaultServices vaultServices, CacheAuthorization cacheAuthorization) {
         this.vaultServices = vaultServices;
+        this.cacheAuthorization = cacheAuthorization;
         state = new SimpleObjectProperty<>(new VaultsManagementState(null, null, null, false, false, false));
     }
 
@@ -119,11 +122,10 @@ public class VaultsManagementViewModel {
         }
     }
 
-    public void createVault(String username, String name, String password, boolean readByAll, boolean writeByAll, String userPassword) {
+    public void createVault(String username, String name, String password, boolean readByAll, boolean writeByAll) {
         if (username != null && !username.isEmpty()
                 && name != null && !name.isEmpty()
-                && password != null && !password.isEmpty()
-                && userPassword != null && !userPassword.isEmpty()) {
+                && password != null && !password.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
             Vault vault = Vault.builder()
                     .name(name)
@@ -132,7 +134,7 @@ public class VaultsManagementViewModel {
                     .readByAll(readByAll)
                     .writeByAll(writeByAll)
                     .build();
-            vaultServices.save(vault, userPassword)
+            vaultServices.save(vault, cacheAuthorization.getPassword())
                     .subscribeOn(Schedulers.single())
                     .subscribe(either -> {
                         if (either.isLeft())
