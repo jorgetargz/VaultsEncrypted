@@ -1,11 +1,10 @@
 package org.jorgetargz.client.dao.vault_api.utils;
 
 import jakarta.inject.Inject;
-import org.jorgetargz.client.dao.common.Constantes;
-import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jorgetargz.client.dao.common.Constantes;
 
 import java.io.IOException;
 
@@ -47,7 +46,7 @@ public class AuthorizationInterceptor implements Interceptor {
         if (tokenExpiredHeader != null && tokenExpiredHeader.equals(Constantes.TRUE)) {
             response.close();
             request = original.newBuilder()
-                    .header(Constantes.AUTHORIZATION, Credentials.basic(ca.getUser(), ca.getPassword())).build();
+                    .header(Constantes.AUTHORIZATION, ca.getCertificateAuth()).build();
             response = chain.proceed(request);
             if (response.header(Constantes.AUTHORIZATION) != null)
                 ca.setJwtAuth(response.header(Constantes.AUTHORIZATION));
