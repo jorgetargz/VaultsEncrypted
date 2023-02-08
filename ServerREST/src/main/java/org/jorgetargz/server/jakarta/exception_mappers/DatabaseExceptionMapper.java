@@ -1,10 +1,10 @@
 package org.jorgetargz.server.jakarta.exception_mappers;
 
-import org.jorgetargz.server.dao.excepciones.DatabaseException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.jorgetargz.server.dao.excepciones.DatabaseException;
 import org.jorgetargz.utils.modelo.BaseError;
 
 import java.time.LocalDateTime;

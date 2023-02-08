@@ -1,15 +1,15 @@
 package org.jorgetargz.client.dao.impl;
 
 import com.google.gson.Gson;
-import org.jorgetargz.client.dao.common.Constantes;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.vavr.control.Either;
 import jakarta.inject.Inject;
 import lombok.extern.log4j.Log4j2;
-import org.jorgetargz.utils.modelo.BaseError;
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
+import org.jorgetargz.client.dao.common.Constantes;
+import org.jorgetargz.utils.modelo.BaseError;
 import retrofit2.HttpException;
 import retrofit2.Response;
 

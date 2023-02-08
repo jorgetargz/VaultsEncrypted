@@ -1,9 +1,9 @@
 package org.jorgetargz.client.dao.vault_api.config;
 
-import org.jorgetargz.client.dao.common.Constantes;
 import jakarta.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.jorgetargz.client.dao.common.Constantes;
 
 import java.io.IOException;
 import java.util.Properties;

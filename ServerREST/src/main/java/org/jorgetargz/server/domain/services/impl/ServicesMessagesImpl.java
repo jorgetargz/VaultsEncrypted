@@ -52,9 +52,9 @@ public class ServicesMessagesImpl implements ServicesMessages {
     }
 
     private void checkPermsionToWrite(Vault vault, String usernameReader) {
-            if (!vault.getUsernameOwner().equals(usernameReader) && !vault.isWriteByAll()) {
-                throw new ValidationException(Constantes.ONLY_THE_OWNER_OF_THE_VAULT_CAN_WRITE_IN_IT);
-            }
+        if (!vault.getUsernameOwner().equals(usernameReader) && !vault.isWriteByAll()) {
+            throw new ValidationException(Constantes.ONLY_THE_OWNER_OF_THE_VAULT_CAN_WRITE_IN_IT);
+        }
     }
 
     @Override

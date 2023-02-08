@@ -1,11 +1,11 @@
 package org.jorgetargz.client.gui.screens.main;
 
-import org.jorgetargz.client.domain.services.LoginServices;
 import jakarta.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.jorgetargz.client.domain.services.LoginServices;
 
 public class MainViewModel {
 

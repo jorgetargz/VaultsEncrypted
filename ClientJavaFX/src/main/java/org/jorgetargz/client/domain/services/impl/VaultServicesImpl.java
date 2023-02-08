@@ -9,15 +9,15 @@ import org.jorgetargz.client.dao.UsersDAO;
 import org.jorgetargz.client.dao.VaultDAO;
 import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.services.VaultServices;
+import org.jorgetargz.security.EncriptacionRSA;
+import org.jorgetargz.security.KeyStoreUtils;
 import org.jorgetargz.utils.modelo.User;
 import org.jorgetargz.utils.modelo.Vault;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
@@ -33,12 +33,16 @@ public class VaultServicesImpl implements VaultServices {
     private final VaultDAO vaultDAO;
     private final UsersDAO usersDAO;
     private final CacheAuthorization cacheAuthorization;
+    private final KeyStoreUtils keyStoreUtils;
+    private final EncriptacionRSA encriptacionRSA;
 
     @Inject
-    public VaultServicesImpl(VaultDAO vaultDAO, UsersDAO usersDAO, CacheAuthorization cacheAuthorization) {
+    public VaultServicesImpl(VaultDAO vaultDAO, UsersDAO usersDAO, CacheAuthorization cacheAuthorization, KeyStoreUtils keyStoreUtils, EncriptacionRSA encriptacionRSA) {
         this.vaultDAO = vaultDAO;
         this.usersDAO = usersDAO;
         this.cacheAuthorization = cacheAuthorization;
+        this.keyStoreUtils = keyStoreUtils;
+        this.encriptacionRSA = encriptacionRSA;
     }
 
     @Override
@@ -47,50 +51,44 @@ public class VaultServicesImpl implements VaultServices {
     }
 
     @Override
-    public Vault get(String vaultName, String username, String vaultPassword) {
+    public Single<Either<String, Vault>> get(String vaultName, String username, String vaultPassword) {
         vaultName = Base64.getUrlEncoder().encodeToString(vaultName.getBytes());
         username = Base64.getUrlEncoder().encodeToString(username.getBytes());
 
         CompletableFuture<Vault> vaultCompletableFuture = new CompletableFuture<>();
-        vaultDAO.get(vaultName, username)
-                .subscribe(either -> {
-                    if (either.isLeft()) {
-                        vaultCompletableFuture.completeExceptionally(
-                                new RuntimeException(either.getLeft())
-                        );
-                        log.error(either.getLeft());
-                    } else {
-                        vaultCompletableFuture.complete(either.get());
-                    }
-                });
-        Vault vault = vaultCompletableFuture.join();
-        //Se lee el keyStore para obtener el certificado
-        Path keystorePath = Paths.get(cacheAuthorization.getUser() + "KeyStore.pfx");
-        if (!Files.exists(keystorePath)) {
-            log.error("No existe el keystore");
-            throw new RuntimeException("No existe el keystore");
+        Vault vault;
+        try {
+            vaultDAO.get(vaultName, username)
+                    .subscribe(either -> {
+                        if (either.isLeft()) {
+                            log.error(either.getLeft());
+                            vaultCompletableFuture.completeExceptionally(new RuntimeException(either.getLeft()));
+                        } else {
+                            vaultCompletableFuture.complete(either.get());
+                        }
+                    });
+            vault = vaultCompletableFuture.join();
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+            return Single.just(Either.left(e.getMessage()));
         }
-        char[] secretKey = cacheAuthorization.getPassword().toCharArray();
+
+        //Se lee el keyStore del usuario
         KeyStore keyStore;
         try {
-            keyStore = KeyStore.getInstance("PKCS12");
-        } catch (KeyStoreException e) {
+            keyStore = getKeyStore();
+        } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al obtener el KeyStore");
-        }
-        try {
-            keyStore.load(Files.newInputStream(keystorePath), secretKey);
-        } catch (IOException | CertificateException | NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al cargar el KeyStore");
+            return Single.just(Either.left("Error reading keystore"));
         }
 
         //Se obtiene la clave privada
         PrivateKey privateKey;
         try {
-            privateKey = (PrivateKey) keyStore.getKey("privada", secretKey);
+            privateKey = keyStoreUtils.getPrivateKey(keyStore, "privada", cacheAuthorization.getPassword());
         } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
+            return Single.just(Either.left("Error reading private key"));
         }
 
         //Se decodifica la clave pública encriptada con Base64
@@ -99,22 +97,20 @@ public class VaultServicesImpl implements VaultServices {
         //Se desencripta la contraseña con la clave privada del usuario
         byte[] passwordDecryptedBytes;
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            passwordDecryptedBytes = cipher.doFinal(passwordEncrypted);
+            passwordDecryptedBytes = encriptacionRSA.desencriptar(passwordEncrypted, privateKey);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            return Single.just(Either.left("Error decrypting password"));
         }
 
         String passwordDecrypted = new String(passwordDecryptedBytes);
         if (passwordDecrypted.equals(vaultPassword)) {
             vault.setKey(vaultPassword);
-            return vault;
+            return Single.just(Either.right(vault));
         } else {
             log.error("Wrong password");
-            throw new RuntimeException("Wrong password");
+            return Single.just(Either.left("Wrong password"));
         }
     }
 
@@ -122,46 +118,33 @@ public class VaultServicesImpl implements VaultServices {
     public Single<Either<String, Vault>> save(Vault vault) {
         String vaultPassword = vault.getKey();
 
-        //Se lee el keyStore para obtener el certificado
-        Path keystorePath = Paths.get(cacheAuthorization.getUser() + "KeyStore.pfx");
-        if (!Files.exists(keystorePath)) {
-            log.error("No existe el keystore");
-            throw new RuntimeException("No existe el keystore");
-        }
-        char[] secretKey = cacheAuthorization.getPassword().toCharArray();
+        //Se lee el keyStore del usuario
         KeyStore keyStore;
         try {
-            keyStore = KeyStore.getInstance("PKCS12");
-        } catch (KeyStoreException e) {
+            keyStore = getKeyStore();
+        } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al obtener el KeyStore");
+            return Single.just(Either.left("Error reading keystore"));
         }
-        try {
-            keyStore.load(Files.newInputStream(keystorePath), secretKey);
-        } catch (IOException | CertificateException | NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al cargar el KeyStore");
-        }
+
 
         //Se obtiene la clave pública del certificado
         PublicKey publicKey;
         try {
-            publicKey = keyStore.getCertificate("publica").getPublicKey();
+            publicKey = keyStoreUtils.getPublicKey(keyStore, "publica");
         } catch (KeyStoreException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al obtener la clave publica del certificado");
+            return Single.just(Either.left("Error al obtener la clave pública del certificado"));
         }
 
         //Se cifra la contraseña del vault con la clave pública
         byte[] vaultPasswordEncryptedBytes;
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            vaultPasswordEncryptedBytes = cipher.doFinal(vaultPassword.getBytes());
+            vaultPasswordEncryptedBytes = encriptacionRSA.encriptar(vaultPassword.getBytes(), publicKey);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al encriptar la clave del vault con la clave privada");
+            return Single.just(Either.left("Error al cifrar la contraseña del vault"));
         }
 
         String vaultPasswordEncryptedBase64 = Base64.getUrlEncoder().encodeToString(vaultPasswordEncryptedBytes);
@@ -174,18 +157,24 @@ public class VaultServicesImpl implements VaultServices {
     public Single<Either<String, Vault>> share(Vault vault, String username) {
         CompletableFuture<User> userCompletableFuture = new CompletableFuture<>();
         String usernameBase64 = Base64.getUrlEncoder().encodeToString(username.getBytes());
-        usersDAO.get(usernameBase64)
-                .subscribe(either -> {
-                    if (either.isLeft()) {
-                        userCompletableFuture.completeExceptionally(
-                                new RuntimeException(either.getLeft())
-                        );
-                        log.error(either.getLeft());
-                    } else {
-                        userCompletableFuture.complete(either.get());
-                    }
-                });
-        User user = userCompletableFuture.join();
+        User user;
+        try {
+            usersDAO.get(usernameBase64)
+                    .subscribe(either -> {
+                        if (either.isLeft()) {
+                            userCompletableFuture.completeExceptionally(
+                                    new RuntimeException(either.getLeft())
+                            );
+                            log.error(either.getLeft());
+                        } else {
+                            userCompletableFuture.complete(either.get());
+                        }
+                    });
+            user = userCompletableFuture.join();
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+            return Single.just(Either.left("Error getting user"));
+        }
         String certificateBase64 = user.getCertificate();
 
         X509Certificate certificate = X509CertUtils.parse(Base64.getUrlDecoder().decode(certificateBase64));
@@ -193,16 +182,14 @@ public class VaultServicesImpl implements VaultServices {
         //Se obtiene la clave pública del certificado
         PublicKey publicKey = certificate.getPublicKey();
 
-        //Se cifra la contraseña del vault con la clave pública
+        //Se cifra la contraseña del vault con la clave pública del usuario a compartir
         byte[] vaultPasswordEncryptedBytes;
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            vaultPasswordEncryptedBytes = cipher.doFinal(vault.getKey().getBytes());
+            vaultPasswordEncryptedBytes = encriptacionRSA.encriptar(vault.getKey().getBytes(), publicKey);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al encriptar la clave del vault con la clave publica del usuario");
+            return Single.just(Either.left("Error al encriptar la clave del vault con la clave publica del usuario a compartir"));
         }
 
         //Se codifica la clave encriptada con Base64
@@ -214,5 +201,12 @@ public class VaultServicesImpl implements VaultServices {
     @Override
     public Single<Either<String, Boolean>> delete(int vaultId) {
         return vaultDAO.delete(vaultId);
+    }
+
+    private KeyStore getKeyStore() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+        Path keystorePath = Paths.get(cacheAuthorization.getUser() + "KeyStore.pfx");
+        KeyStore keyStore;
+        keyStore = keyStoreUtils.getKeyStore(keystorePath, cacheAuthorization.getPassword());
+        return keyStore;
     }
 }

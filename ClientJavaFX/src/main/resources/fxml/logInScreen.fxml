@@ -6,14 +6,18 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-
-<AnchorPane prefHeight="650.0" prefWidth="980.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jorgetargz.client.gui.screens.login.LoginController">
-    <Label id="tituloLogin" layoutX="415.0" layoutY="33.0" text="%Title" />
-    <ImageView fx:id="logo" fitHeight="222.0" fitWidth="290.0" layoutX="333.0" layoutY="120.0" pickOnBounds="true" preserveRatio="true">
+<AnchorPane prefHeight="650.0" prefWidth="980.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jorgetargz.client.gui.screens.login.LoginController">
+    <Label id="tituloLogin" layoutX="415.0" layoutY="33.0" text="%Title"/>
+    <ImageView fx:id="logo" fitHeight="222.0" fitWidth="290.0" layoutX="333.0" layoutY="120.0" pickOnBounds="true"
+               preserveRatio="true">
     </ImageView>
-    <MFXTextField fx:id="txtUsername" floatMode="BORDER" layoutX="333.0" layoutY="378.0" prefHeight="2.0" prefWidth="290.0" promptText="%Username" />
-    <MFXPasswordField fx:id="txtPass" layoutX="333.0" layoutY="445.0" prefHeight="53.0" prefWidth="290.0" promptText="%PasswordRequired" />
-    <MFXButton layoutX="395.0" layoutY="529.0" mnemonicParsing="false" onAction="#doLogin" prefHeight="34.0" prefWidth="166.0" text="%Login" />
-   <Label layoutX="382.0" layoutY="592.0" text="root:root, jorge:jorge, javier:javier" />
+    <MFXTextField fx:id="txtUsername" floatMode="BORDER" layoutX="333.0" layoutY="378.0" prefHeight="2.0"
+                  prefWidth="290.0" promptText="%Username"/>
+    <MFXPasswordField fx:id="txtPass" layoutX="333.0" layoutY="445.0" prefHeight="53.0" prefWidth="290.0"
+                      promptText="%PasswordRequired"/>
+    <MFXButton layoutX="395.0" layoutY="529.0" mnemonicParsing="false" onAction="#doLogin" prefHeight="34.0"
+               prefWidth="166.0" text="%Login"/>
+    <Label layoutX="382.0" layoutY="592.0" text="root:root, jorge:jorge, javier:javier"/>
 
 </AnchorPane>

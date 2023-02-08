@@ -32,12 +32,15 @@ public class UsersManagementViewModel {
                     .password(inputPassword)
                     .build();
             state.set(new UsersManagementState(null, false, true, false));
-            try {
-                usersServices.save(user);
-                state.set(new UsersManagementState(null, true, false, true));
-            } catch (RuntimeException e) {
-                state.set(new UsersManagementState(e.getMessage(), false, false, true));
-            }
+                usersServices.save(user)
+                        .subscribeOn(Schedulers.single())
+                        .subscribe(either -> {
+                            if (either.isLeft())
+                                state.set(new UsersManagementState(either.getLeft(), false, false, true));
+                            else {
+                                state.set(new UsersManagementState(null, true, false, true));
+                            }
+                        });
         } else {
             state.set(new UsersManagementState(ScreenConstants.FILL_ALL_THE_INPUTS, false, false, true));
         }

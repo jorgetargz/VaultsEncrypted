@@ -21,7 +21,7 @@ public class VaultsViewModel {
     public VaultsViewModel(MessagesServices messageServices, VaultServices vaultServices) {
         this.messageServices = messageServices;
         this.vaultServices = vaultServices;
-        state = new SimpleObjectProperty<>(new VaultState(null, null,  false, false, false));
+        state = new SimpleObjectProperty<>(new VaultState(null, null, false, false, false));
     }
 
     public ReadOnlyObjectProperty<VaultState> getState() {

@@ -58,12 +58,15 @@ public class VaultsManagementViewModel {
     public void openMyVault(Vault vault, String passwordText) {
         if (vault != null && passwordText != null && !passwordText.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
-            try {
-                Vault response = vaultServices.get(vault.getName(), vault.getUsernameOwner(), passwordText);
-                state.set(new VaultsManagementState(null, null, response, false, false, true));
-            } catch (Exception e) {
-                state.set(new VaultsManagementState(e.getMessage(), null, null, false, false, true));
-            }
+            vaultServices.get(vault.getName(), vault.getUsernameOwner(), passwordText)
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(either -> {
+                        if (either.isLeft())
+                            state.set(new VaultsManagementState(either.getLeft(), null, null, false, false, true));
+                        else {
+                            state.set(new VaultsManagementState(null, null, either.get(), false, false, true));
+                        }
+                    });
         } else {
             state.set(new VaultsManagementState(ScreenConstants.FILL_ALL_THE_INPUTS, null, null, false, false, true));
         }
@@ -73,12 +76,16 @@ public class VaultsManagementViewModel {
     public void openOtherUserVault(String usernameOwnerText, String nameVaultText, String passwordText) {
         if (usernameOwnerText != null && !usernameOwnerText.isEmpty() && nameVaultText != null && !nameVaultText.isEmpty() && passwordText != null && !passwordText.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
-            try {
-                Vault response = vaultServices.get(nameVaultText, usernameOwnerText, passwordText);
-                state.set(new VaultsManagementState(null, null, response, false, false, true));
-            } catch (Exception e) {
-                state.set(new VaultsManagementState(e.getMessage(), null, null, false, false, true));
-            }
+            vaultServices.get(nameVaultText, usernameOwnerText, passwordText)
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(either -> {
+                        if (either.isLeft())
+                            state.set(new VaultsManagementState(either.getLeft(), null, null, false, false, true));
+                        else {
+                            state.set(new VaultsManagementState(null, null, either.get(), false, false, true));
+                        }
+                    });
+
         } else {
             state.set(new VaultsManagementState(ScreenConstants.FILL_ALL_THE_INPUTS, null, null, false, false, true));
         }

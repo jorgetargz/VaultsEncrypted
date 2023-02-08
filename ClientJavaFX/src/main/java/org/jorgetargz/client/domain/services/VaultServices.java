@@ -10,7 +10,7 @@ public interface VaultServices {
 
     Single<Either<String, List<Vault>>> getAll();
 
-    Vault get(String vaultName, String username, String password);
+    Single<Either<String, Vault>> get(String vaultName, String username, String password);
 
     Single<Either<String, Vault>> save(Vault vault);
 

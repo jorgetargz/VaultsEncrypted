@@ -2,13 +2,13 @@ package org.jorgetargz.server.dao.jdbc_impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.jorgetargz.server.configuration.Configuration;
-import org.jorgetargz.server.dao.DBConnection;
-import org.jorgetargz.server.dao.common.Constantes;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.log4j.Log4j2;
+import org.jorgetargz.server.configuration.Configuration;
+import org.jorgetargz.server.dao.DBConnection;
+import org.jorgetargz.server.dao.common.Constantes;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

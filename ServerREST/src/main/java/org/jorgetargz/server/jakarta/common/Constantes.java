@@ -8,7 +8,6 @@ public class Constantes {
     }
 
 
-
     public static final String TOKEN_IN_BLACK_LIST = "Token in black list";
 
     public static final int EXPIRATION_TIME_MINUTES_IN_THE_FUTURE = 5;
@@ -31,5 +30,4 @@ public class Constantes {
     public static final String API_AUTH = "API Auth";
     public static final String NOMBRE = "Nombre";
     public static final String ROLES = "Roles";
-    public static final String KEY_ID = "VaultsAPI";
 }

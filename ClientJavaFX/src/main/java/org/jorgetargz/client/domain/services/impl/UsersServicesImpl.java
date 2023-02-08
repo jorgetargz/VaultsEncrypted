@@ -10,12 +10,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jorgetargz.client.dao.UsersDAO;
 import org.jorgetargz.client.domain.services.UsersServices;
 import org.jorgetargz.security.EncriptacionAES;
+import org.jorgetargz.security.EncriptacionRSA;
+import org.jorgetargz.security.KeyPairUtils;
+import org.jorgetargz.security.KeyStoreUtils;
 import org.jorgetargz.utils.common.ConstantesAPI;
 import org.jorgetargz.utils.modelo.ContentCiphedAES;
 import org.jorgetargz.utils.modelo.User;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
@@ -24,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.X509EncodedKeySpec;
@@ -37,31 +38,34 @@ public class UsersServicesImpl implements UsersServices {
     private final UsersDAO usersDAO;
     private final PublicKey serverPublicKey;
     private final EncriptacionAES encriptacionAES;
+    private final EncriptacionRSA encriptacionRSA;
+    private final KeyStoreUtils keyStoreUtils;
+    private final KeyPairUtils keyPairUtils;
 
     @Inject
     public UsersServicesImpl(@Named("serverPublicKey") PublicKey serverPublicKey,
-                             UsersDAO usersDAO, EncriptacionAES encriptacionAES) {
+                             UsersDAO usersDAO, EncriptacionAES encriptacionAES, EncriptacionRSA encriptacionRSA, KeyStoreUtils keyStoreUtils, KeyPairUtils keyPairUtils) {
         this.usersDAO = usersDAO;
         this.serverPublicKey = serverPublicKey;
         this.encriptacionAES = encriptacionAES;
+        this.encriptacionRSA = encriptacionRSA;
+        this.keyStoreUtils = keyStoreUtils;
+        this.keyPairUtils = keyPairUtils;
     }
 
     @Override
-    public void save(User user) {
+    public Single<Either<String, User>> save(User user) {
 
         //Se establece el rol del usuario
         user.setRole(ConstantesAPI.ROLE_USER);
 
         //Se genera una clave simétrica AES de 256 bits
-        KeyPairGenerator generadorRSA;
+        KeyPair clavesRSACliente;
         try {
-            generadorRSA = KeyPairGenerator.getInstance("RSA");
+            clavesRSACliente = keyPairUtils.generateKeyPair(2048);
         } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al generar la clave pública del cliente");
+            return Single.just(Either.left("Error al generar las claves RSA"));
         }
-        generadorRSA.initialize(2048);
-        KeyPair clavesRSACliente = generadorRSA.generateKeyPair();
         PrivateKey clavePrivadaCliente = clavesRSACliente.getPrivate();
         PublicKey clavePublicaCliente = clavesRSACliente.getPublic();
 
@@ -83,13 +87,11 @@ public class UsersServicesImpl implements UsersServices {
         //Se encripta la clave aleatoria con la clave pública del servidor
         byte[] passwordEncrypted;
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, serverPublicKey);
-            passwordEncrypted = cipher.doFinal(password.getBytes());
+            passwordEncrypted = encriptacionRSA.encriptar(password.getBytes(), serverPublicKey);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al encriptar la clave aleatoria con la clave pública del servidor");
+            return Single.just(Either.left("Error al encriptar la clave aleatoria"));
         }
 
         //Se almacena la clave aleatoria encriptada en el usuario codificada en Base64
@@ -98,63 +100,56 @@ public class UsersServicesImpl implements UsersServices {
         // Se almacena el usuario en la base de datos y se obtiene el
         // usuario con un certificado firmado por el servidor
         CompletableFuture<User> userCompletableFuture = new CompletableFuture<>();
-        usersDAO.save(user)
-                .subscribe(either -> {
-                    if (either.isLeft()) {
-                        userCompletableFuture.completeExceptionally(
-                                new RuntimeException(either.getLeft())
-                        );
-                        log.error(either.getLeft());
-                    } else {
-                        userCompletableFuture.complete(either.get());
-                    }
-                });
-        User userWithCertificate = userCompletableFuture.join();
-
-        //Se crea un KeyStore
-        KeyStore ks;
+        User userWithCertificate;
         try {
-            ks = KeyStore.getInstance("PKCS12");
-            ks.load(null, null);
-        } catch (KeyStoreException | CertificateException | IOException | NoSuchAlgorithmException e) {
+            usersDAO.save(user)
+                    .subscribe(either -> {
+                        if (either.isLeft()) {
+                            userCompletableFuture.completeExceptionally(
+                                    new RuntimeException(either.getLeft())
+                            );
+                            log.error(either.getLeft());
+                        } else {
+                            userCompletableFuture.complete(either.get());
+                        }
+                    });
+            userWithCertificate = userCompletableFuture.join();
+        } catch (RuntimeException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("No se ha podido crear el KeyStore");
+            return Single.just(Either.left("Error al guardar el usuario en la base de datos"));
         }
-
-        // Se genera un salt aleatorio
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-
-        // Se convierte el password en un char[] para poder usarla en el KeyStore
-        char[] secretKey = user.getPassword().toCharArray();
 
         // Se obtiene el certificado del usuario
         X509Certificate cert = X509CertUtils.parse(Base64.getUrlDecoder().decode(userWithCertificate.getCertificate()));
 
+        //Se crea un KeyStore
+        KeyStore ks;
         try {
-            //Se guarda el certificado en el KeyStore
-            ks.setCertificateEntry("publica", cert);
-            //Se guarda la clave privada en el KeyStore con la misma secretKey que el KeyStore
-            ks.setKeyEntry("privada", clavePrivadaCliente, secretKey, new Certificate[]{cert});
-        } catch (KeyStoreException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("No se ha podido guardar el certificado y la clave privada en el KeyStore");
+            ks = keyStoreUtils.createKeyStore(user.getPassword(), cert, clavePrivadaCliente);
+        } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException e) {
+            return Single.just(Either.left("Error al crear el KeyStore"));
         }
 
         // Se guarda el KeyStore en un fichero
         Path keystorePath = Paths.get(user.getUsername() + "KeyStore.pfx");
         try (OutputStream fos = Files.newOutputStream(keystorePath)) {
-            //Se guarda el KeyStore en el fichero
-            ks.store(fos, secretKey);
+            ks.store(fos, user.getPassword().toCharArray());
         } catch (IOException | CertificateException | NoSuchAlgorithmException | KeyStoreException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("No se ha podido guardar el KeyStore en el fichero");
+            return Single.just(Either.left("Error al guardar el KeyStore"));
         }
+
+        return Single.just(Either.right(userWithCertificate));
     }
 
     @Override
     public Single<Either<String, Boolean>> delete(String username) {
+        Path keystorePath = Paths.get(username + "KeyStore.pfx");
+        try {
+            Files.delete(keystorePath);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
         username = Base64.getUrlEncoder().encodeToString(username.getBytes());
         return usersDAO.delete(username);
     }

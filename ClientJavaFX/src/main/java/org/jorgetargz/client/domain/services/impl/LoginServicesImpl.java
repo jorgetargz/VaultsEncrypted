@@ -8,6 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.jorgetargz.client.dao.LoginDAO;
 import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.services.LoginServices;
+import org.jorgetargz.security.KeyStoreUtils;
 import org.jorgetargz.utils.modelo.User;
 
 import java.io.IOException;
@@ -23,43 +24,40 @@ public class LoginServicesImpl implements LoginServices {
 
     private final LoginDAO loginDAO;
     private final CacheAuthorization cache;
+    private final KeyStoreUtils keyStoreUtils;
 
     @Inject
-    public LoginServicesImpl(LoginDAO loginDAO, CacheAuthorization cache) {
+    public LoginServicesImpl(LoginDAO loginDAO, CacheAuthorization cache, KeyStoreUtils keyStoreUtils) {
         this.loginDAO = loginDAO;
         this.cache = cache;
+        this.keyStoreUtils = keyStoreUtils;
     }
 
     @Override
     public Single<Either<String, User>> scLogin(String username, String password) {
-        //Se lee el keyStore para obtener el certificado
+        //Se comprueba si el usuario tiene un KeyStore
         Path keystorePath = Paths.get(username + "KeyStore.pfx");
         if (!Files.exists(keystorePath)) {
             log.error("No existe el keystore");
-            throw new RuntimeException("No existe el keystore");
+            return Single.just(Either.left("No existe el keystore"));
         }
-        char[] secretKey = password.toCharArray();
+
+        //Se lee el keyStore del usuario
         KeyStore keyStore;
         try {
-            keyStore = KeyStore.getInstance("PKCS12");
-        } catch (KeyStoreException e) {
+            keyStore = keyStoreUtils.getKeyStore(keystorePath, password);
+        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al obtener el KeyStore");
-        }
-        try {
-            keyStore.load(Files.newInputStream(keystorePath), secretKey);
-        } catch (IOException | CertificateException | NoSuchAlgorithmException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al cargar el KeyStore");
+            return Single.just(Either.left("Error al leer el KeyStore"));
         }
 
         //Se obtiene la clave privada del KeyStore
         PrivateKey privateKey;
         try {
-            privateKey = (PrivateKey) keyStore.getKey("privada", secretKey);
+            privateKey = keyStoreUtils.getPrivateKey(keyStore, "privada", password);
         } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al obtener la clave privada del KeyStore");
+            return Single.just(Either.left("Error al obtener la clave privada del KeyStore"));
         }
 
         //Se genera un String aleatorio
@@ -74,7 +72,7 @@ public class LoginServicesImpl implements LoginServices {
             signature = sign.sign();
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al firmar el String aleatorio");
+            return Single.just(Either.left("Error al firmar el String aleatorio"));
         }
 
         //Se codifica en Base64
@@ -100,6 +98,7 @@ public class LoginServicesImpl implements LoginServices {
         cache.setUser(null);
         cache.setPassword(null);
         cache.setJwtAuth(null);
+        cache.setCertificateAuth(null);
         return loginDAO.logout(jwtAuth);
     }
 }

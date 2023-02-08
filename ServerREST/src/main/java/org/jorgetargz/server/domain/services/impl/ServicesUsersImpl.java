@@ -11,6 +11,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.jorgetargz.security.EncriptacionAES;
+import org.jorgetargz.security.EncriptacionRSA;
 import org.jorgetargz.server.dao.UsersDao;
 import org.jorgetargz.server.domain.common.Constantes;
 import org.jorgetargz.server.domain.services.ServicesUsers;
@@ -20,7 +21,6 @@ import org.jorgetargz.utils.modelo.ContentCiphedAES;
 import org.jorgetargz.utils.modelo.User;
 
 import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.Serializable;
@@ -43,15 +43,17 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
     private final UsersDao daoLogin;
     private final JWTBlackList jwtBlackList;
     private final EncriptacionAES encriptacionAES;
+    private final EncriptacionRSA encriptacionRSA;
     private final KeyPair keyPair;
 
     @Inject
     public ServicesUsersImpl(UsersDao daoLogin, JWTBlackList jwtBlackList,
-                             EncriptacionAES encriptacionAES, KeyPair keyPair
+                             EncriptacionAES encriptacionAES, EncriptacionRSA encriptacionRSA, KeyPair keyPair
     ) {
         this.daoLogin = daoLogin;
         this.jwtBlackList = jwtBlackList;
         this.encriptacionAES = encriptacionAES;
+        this.encriptacionRSA = encriptacionRSA;
         this.keyPair = keyPair;
     }
 
@@ -59,7 +61,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
     public User scGet(String username) {
         if (username == null) {
             log.warn(Constantes.USERNAME_EMPTY);
-            throw new ValidationException(Constantes.USERNAME_OR_PASSWORD_EMPTY);
+            throw new ValidationException(Constantes.USERNAME_EMPTY);
         }
         return daoLogin.get(username);
     }
@@ -68,7 +70,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
     public User scGetBase64(String username) {
         if (username == null) {
             log.warn(Constantes.USERNAME_EMPTY);
-            throw new ValidationException(Constantes.USERNAME_OR_PASSWORD_EMPTY);
+            throw new ValidationException(Constantes.USERNAME_EMPTY);
         }
         username = new String(Base64.getUrlDecoder().decode(username));
         return daoLogin.get(username);
@@ -79,35 +81,33 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         ContentCiphedAES publicKeyEncrypted = user.getPublicKeyEncrypted();
         String passwordEncryptedBase64 = user.getEncryptedPasswordOfPublicKeyEncrypted();
 
-        //Se decodifica la clave pública encriptada con Base64
+        //Se decodifica de Base64 la clave pública encriptada
         byte[] passwordEncrypted = Base64.getUrlDecoder().decode(passwordEncryptedBase64);
 
         //Se desencripta la contraseña con la clave privada del servidor
         byte[] passwordDecrypted;
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
-            passwordDecrypted = cipher.doFinal(passwordEncrypted);
+            passwordDecrypted = encriptacionRSA.desencriptar(passwordEncrypted, keyPair.getPrivate());
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new ValidationException("Error al desencriptar la contraseña con la clave privada del servidor");
         }
 
-        //Se desencripta la clave pública con la contraseña desencriptada
+        //Se desencripta la clave pública con la contraseña
         String publicKeyBase64 = encriptacionAES.desencriptar(publicKeyEncrypted, new String(passwordDecrypted));
 
-        //Se decodifica la clave pública en Base64
+        //Se decodifica la clave pública de Base64
         byte[] publicKeyBytes = Base64.getUrlDecoder().decode(publicKeyBase64);
 
-        //Se crea un objeto PublicKey a partir de la clave pública
+        //Se crea un objeto PublicKey a partir del keySpec
         X509EncodedKeySpec x509Spec = new X509EncodedKeySpec(publicKeyBytes);
         PublicKey publicKey;
         try {
             publicKey = KeyFactory.getInstance("RSA").generatePublic(x509Spec);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new ValidationException("Error al crear la clave pública");
         }
 
         //Se crea un certificado con la clave pública del usuario firmado con la clave privada del servidor
@@ -128,7 +128,8 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         try {
             signer = new JcaContentSignerBuilder("SHA1WithRSAEncryption").build(keyPair.getPrivate());
         } catch (OperatorCreationException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
+            throw new ValidationException("Error al firmar el certificado");
         }
 
         //Se obtiene el certificado
@@ -136,7 +137,8 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         try {
             certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
         } catch (CertificateException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
+            throw new ValidationException("Error al obtener el certificado");
         }
 
         //Pasar el certificado a base64
@@ -144,7 +146,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         try {
             certificadoBase64 = Base64.getUrlEncoder().encodeToString(certificate.getEncoded());
         } catch (CertificateEncodingException e) {
-            throw new RuntimeException(e);
+            throw new ValidationException("Error al codificar el certificado a base64");
         }
 
         //Se guarda el certificado en base64 en el usuario para que se guarde en la base de datos

@@ -23,7 +23,8 @@ public class SQLQueries {
 
     public static final String INSERT_VAULT_SHARE = "INSERT INTO vaultShares (vaultId, username, `key`) VALUES (?,?,?)";
     public static final String SELECT_VAULT_KEY_FOR_USER = "SELECT `key` FROM vaultShares WHERE vaultId = ? AND username = ?";
-    public static final String DELETE_VAULT_SHARES_QUERY = "DELETE FROM vaultShares WHERE vaultId = ?";
+    public static final String DELETE_VAULT_SHARES_QUERY_BY_VAULT_ID = "DELETE FROM vaultShares WHERE vaultId = ?";
+    public static final String DELETE_VAULTS_SHARES_QUERY_BY_USERNAME = "DELETE FROM vaultShares WHERE username = ?";
 
     private SQLQueries() {
     }

@@ -1,6 +1,6 @@
 package org.jorgetargz.server.domain.services;
 
-import org.jorgetargz.utils.modelo.*;
+import org.jorgetargz.utils.modelo.Vault;
 
 import java.util.List;
 

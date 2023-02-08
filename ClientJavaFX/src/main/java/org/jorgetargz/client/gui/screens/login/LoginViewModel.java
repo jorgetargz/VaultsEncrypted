@@ -1,13 +1,13 @@
 package org.jorgetargz.client.gui.screens.login;
 
-import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
-import org.jorgetargz.client.gui.screens.common.ScreenConstants;
-import org.jorgetargz.client.domain.services.LoginServices;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
+import org.jorgetargz.client.domain.services.LoginServices;
+import org.jorgetargz.client.gui.screens.common.ScreenConstants;
 
 public class LoginViewModel {
 
@@ -36,7 +36,7 @@ public class LoginViewModel {
                 .observeOn(Schedulers.single())
                 .subscribe(either -> {
                     if (either.isLeft())
-                        state.set(new LoginState(null, either.getLeft(), false,true));
+                        state.set(new LoginState(null, either.getLeft(), false, true));
                     else {
                         cacheAuthorization.setPassword(password);
                         cacheAuthorization.setUser(username);

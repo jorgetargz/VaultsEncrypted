@@ -1,10 +1,10 @@
 package org.jorgetargz.server.configuration;
 
-import org.jorgetargz.server.dao.DBConnection;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import org.jorgetargz.server.dao.DBConnection;
 
 @WebListener()
 public class ListenerConfig implements ServletContextListener {

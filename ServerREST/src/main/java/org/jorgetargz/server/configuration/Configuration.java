@@ -1,9 +1,9 @@
 package org.jorgetargz.server.configuration;
 
-import org.jorgetargz.server.configuration.common.Constantes;
 import jakarta.inject.Singleton;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.jorgetargz.server.configuration.common.Constantes;
 
 import java.util.Properties;
 

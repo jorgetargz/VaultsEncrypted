@@ -157,7 +157,7 @@ public class VaultsDaoImpl implements VaultsDao {
                 preparedStatement.setInt(1, vaultId);
                 preparedStatement.executeUpdate();
             }
-            try (PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.DELETE_VAULT_SHARES_QUERY)) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.DELETE_VAULT_SHARES_QUERY_BY_VAULT_ID)) {
                 preparedStatement.setInt(1, vaultId);
                 preparedStatement.executeUpdate();
             }

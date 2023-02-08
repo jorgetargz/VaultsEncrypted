@@ -6,7 +6,7 @@ import org.jorgetargz.utils.modelo.User;
 
 public interface UsersServices {
 
-    void save(User user);
+    Single<Either<String, User>> save(User user);
 
     Single<Either<String, Boolean>> delete(String username);
 }

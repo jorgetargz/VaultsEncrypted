@@ -1,10 +1,6 @@
 package org.jorgetargz.client.gui.screens.main;
 
 
-import javafx.scene.control.Menu;
-import org.jorgetargz.client.gui.screens.common.BaseScreenController;
-import org.jorgetargz.client.gui.screens.common.ScreenConstants;
-import org.jorgetargz.client.gui.screens.common.Screens;
 import io.github.palexdev.materialfx.font.MFXFontIcon;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -14,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +19,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import lombok.extern.log4j.Log4j2;
+import org.jorgetargz.client.gui.screens.common.BaseScreenController;
+import org.jorgetargz.client.gui.screens.common.ScreenConstants;
+import org.jorgetargz.client.gui.screens.common.Screens;
 import org.jorgetargz.utils.common.ConstantesAPI;
 import org.jorgetargz.utils.modelo.User;
 import org.jorgetargz.utils.modelo.Vault;

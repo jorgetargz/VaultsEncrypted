@@ -2,7 +2,10 @@ package org.jorgetargz.server.jakarta.rest;
 
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.jorgetargz.utils.common.ConstantesAPI;
 

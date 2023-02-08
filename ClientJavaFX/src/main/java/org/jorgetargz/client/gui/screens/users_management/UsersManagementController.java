@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import lombok.extern.log4j.Log4j2;
 import org.jorgetargz.client.gui.screens.common.BaseScreenController;
 import org.jorgetargz.client.gui.screens.common.ScreenConstants;

@@ -1,7 +1,5 @@
 package org.jorgetargz.client.gui.main;
 
-import org.jorgetargz.client.gui.main.common.Constants;
-import org.jorgetargz.client.gui.screens.main.MainController;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.jorgetargz.client.gui.main.common.Constants;
+import org.jorgetargz.client.gui.screens.main.MainController;
 
 import java.io.IOException;
 import java.util.Locale;
