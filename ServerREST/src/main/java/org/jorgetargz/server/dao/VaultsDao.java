@@ -17,7 +17,5 @@ public interface VaultsDao {
 
     String getVaultKeyForUser(int vaultId, String usernameLogged);
 
-    void changePassword(int vaultId, String newPassword);
-
     void deleteVault(int vaultId);
 }

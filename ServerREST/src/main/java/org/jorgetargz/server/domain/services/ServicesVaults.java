@@ -14,7 +14,5 @@ public interface ServicesVaults {
 
     Vault shareVault(Vault vaultInfo, String usernameToShare, String passwordEncWithUserPubKey, String usernameLogged);
 
-    void changePassword(Vault vaultInfo, String password, String usernameLogged);
-
     void deleteVault(int vaultId, String usernameLogged);
 }

@@ -30,7 +30,7 @@ public class RESTUsers {
     @Path(ConstantesAPI.USERNAME_PATH_PARAM)
     @RolesAllowed({ConstantesAPI.ROLE_ADMIN, ConstantesAPI.ROLE_USER})
     public User get(@PathParam(ConstantesAPI.USERNAME_PARAM) String username) {
-        return servicesUsers.scGet(username);
+        return servicesUsers.scGetBase64(username);
     }
 
     @POST

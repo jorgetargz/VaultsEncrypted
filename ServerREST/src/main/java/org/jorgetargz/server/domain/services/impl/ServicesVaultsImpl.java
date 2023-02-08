@@ -1,16 +1,11 @@
 package org.jorgetargz.server.domain.services.impl;
 
 import jakarta.inject.Inject;
-import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import lombok.extern.log4j.Log4j2;
-import org.jorgetargz.security.EncriptacionAES;
-import org.jorgetargz.server.dao.MessagesDao;
 import org.jorgetargz.server.dao.VaultsDao;
 import org.jorgetargz.server.domain.common.Constantes;
 import org.jorgetargz.server.domain.services.ServicesVaults;
 import org.jorgetargz.server.domain.services.excepciones.ValidationException;
-import org.jorgetargz.utils.modelo.ContentCiphedAES;
-import org.jorgetargz.utils.modelo.Message;
 import org.jorgetargz.utils.modelo.Vault;
 
 import java.util.Base64;
@@ -20,17 +15,11 @@ import java.util.List;
 public class ServicesVaultsImpl implements ServicesVaults {
 
     private final VaultsDao vaultsDao;
-    private final MessagesDao messageDao;
-    private final Pbkdf2PasswordHash passwordHash;
-    private final EncriptacionAES encriptacionAES;
     private final Base64.Decoder decoder;
 
     @Inject
-    public ServicesVaultsImpl(VaultsDao vaultsDao, MessagesDao messageDao, Pbkdf2PasswordHash passwordHash, EncriptacionAES encriptacionAES) {
+    public ServicesVaultsImpl(VaultsDao vaultsDao) {
         this.vaultsDao = vaultsDao;
-        this.messageDao = messageDao;
-        this.passwordHash = passwordHash;
-        this.encriptacionAES = encriptacionAES;
         this.decoder = Base64.getUrlDecoder();
     }
 
@@ -48,6 +37,9 @@ public class ServicesVaultsImpl implements ServicesVaults {
     public Vault shareVault(Vault vaultInfo, String usernameToShare, String passwordEncWithUserPubKey, String usernameLogged) {
         Vault vault = vaultsDao.getVault(vaultInfo.getUsernameOwner(), vaultInfo.getName());
         if (vault.getUsernameOwner().equals(usernameLogged)) {
+            if (!vault.isReadByAll()) {
+                throw new ValidationException("This vault can't be shared because it's private");
+            }
             usernameToShare = new String(decoder.decode(usernameToShare));
             return vaultsDao.shareVault(vault, usernameToShare, passwordEncWithUserPubKey);
         } else {
@@ -70,29 +62,6 @@ public class ServicesVaultsImpl implements ServicesVaults {
             }
         } else {
             throw new ValidationException(Constantes.ONLY_THE_OWNER_CAN_READ_THIS_VAULT);
-        }
-    }
-
-    @Override
-    public void changePassword(Vault vaultInfo, String password, String usernameLogged) {
-        String newPassword = new String(decoder.decode(password));
-        int vaultId = vaultInfo.getId();
-        Vault vault = vaultsDao.getVault(vaultId);
-        if (passwordHash.verify(vaultInfo.getKey().toCharArray(), vault.getKey())
-                && vault.getUsernameOwner().equals(usernameLogged)) {
-
-            List<Message> messages = messageDao.getMessages(vaultId);
-            for (Message message : messages) {
-                String messageText = encriptacionAES.desencriptar(message.getContentCiphedAES(), vaultInfo.getKey());
-                ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(messageText, newPassword);
-                message.setContentCiphedAES(contentCiphedAES);
-                messageDao.updateMessage(message);
-            }
-
-            String newPasswordHashed = passwordHash.generate(newPassword.toCharArray());
-            vaultsDao.changePassword(vaultId, newPasswordHashed);
-        } else {
-            throw new ValidationException(Constantes.NOT_THE_OWNER_OF_THIS_VAULT_OR_THE_PASSWORD_IS_INCORRECT);
         }
     }
 

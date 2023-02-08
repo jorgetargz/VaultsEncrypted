@@ -16,7 +16,5 @@ public interface VaultDAO {
 
     Single<Either<String, Vault>> share(Vault vault, String username, String passwordEncWithUserPubKey);
 
-    Single<Either<String, Boolean>> changePassword(Vault credentials, String password);
-
     Single<Either<String, Boolean>> delete(int vaultId);
 }

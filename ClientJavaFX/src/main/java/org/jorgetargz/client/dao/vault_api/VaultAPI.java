@@ -29,9 +29,6 @@ public interface VaultAPI {
             @Query(ConstantesAPI.PASS_ENC_WITH_USER_PUB_KEY_PARAM) String passwordEncWithUserPubKey
     );
 
-    @POST(ConstantesAPI.ENDPOINT_VAULT_CHANGE_PASSWORD)
-    Single<Response<Void>> changePassword(@Body Vault credentials, @Query(ConstantesAPI.PASSWORD) String password);
-
     @DELETE(ConstantesAPI.ENDPOINT_VAULT_DELETE)
     Single<Response<Void>> deleteVault(@Path(ConstantesAPI.VAULT_ID_PARAM) int vaultId);
 }

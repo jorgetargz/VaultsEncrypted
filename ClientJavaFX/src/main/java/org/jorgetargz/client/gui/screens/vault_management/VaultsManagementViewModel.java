@@ -42,24 +42,6 @@ public class VaultsManagementViewModel {
         }
     }
 
-    public void changePassword(Vault vault, String oldPassword, String newPassword) {
-        if (vault != null && oldPassword != null && !oldPassword.isEmpty() && newPassword != null && !newPassword.isEmpty()) {
-            state.set(new VaultsManagementState(null, null, null, false, true, false));
-            vault.setKey(oldPassword);
-            vaultServices.changePassword(vault, newPassword)
-                    .subscribeOn(Schedulers.single())
-                    .subscribe(either -> {
-                        if (either.isLeft())
-                            state.set(new VaultsManagementState(either.getLeft(), null, null, false, false, true));
-                        else {
-                            state.set(new VaultsManagementState(null, null, null, true, false, true));
-                        }
-                    });
-        } else {
-            state.set(new VaultsManagementState(ScreenConstants.FILL_ALL_THE_INPUTS, null, null, false, false, true));
-        }
-    }
-
     public void loadVaults() {
         state.set(new VaultsManagementState(null, null, null, false, true, false));
         vaultServices.getAll()

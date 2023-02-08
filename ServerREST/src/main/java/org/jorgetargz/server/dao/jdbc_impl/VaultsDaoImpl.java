@@ -150,25 +150,14 @@ public class VaultsDaoImpl implements VaultsDao {
     }
 
     @Override
-    public void changePassword(int vaultId, String newPassword) {
-        try (Connection connection = dbConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.UPDATE_VAULT_KEY_QUERY)) {
-            preparedStatement.setString(1, newPassword);
-            preparedStatement.setInt(2, vaultId);
-            if (preparedStatement.executeUpdate() != 1) {
-                throw new NotFoundException(Constantes.VAULT_NOT_FOUND);
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage());
-            throw new DatabaseException(Constantes.DATABASE_ERROR);
-        }
-    }
-
-    @Override
     public void deleteVault(int vaultId) {
         try (Connection connection = dbConnection.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.DELETE_MESSAGES_QUERY)) {
+                preparedStatement.setInt(1, vaultId);
+                preparedStatement.executeUpdate();
+            }
+            try (PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.DELETE_VAULT_SHARES_QUERY)) {
                 preparedStatement.setInt(1, vaultId);
                 preparedStatement.executeUpdate();
             }

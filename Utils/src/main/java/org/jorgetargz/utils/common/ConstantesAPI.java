@@ -13,7 +13,6 @@ public class ConstantesAPI {
 
     //Auxiliar Paths for REST /api/mainPath/auxPath
     public static final String LOGOUT_PATH = "logout/";
-    public static final String VAULT_CHANGE_PASSWORD_PATH = "changePassword/";
     public static final String VAULT_PATH = "vault/";
     public static final String PUBLIC_KEY_PATH = "publicKey/";
     public static final String SHARE_PATH = "share/";
@@ -29,7 +28,7 @@ public class ConstantesAPI {
     //Query Parameters
     public static final String VAULT_NAME = "vaultName";
     public static final String USERNAME_OWNER = "usernameOwner";
-    public static final String PASSWORD = "password";
+    public static final String PASS_ENC_WITH_USER_PUB_KEY_PARAM = "passEncWithUserPubKey";
 
     //ENDPOINTS LOGIN
     public static final String ENDPOINT_LOGIN = PATH_LOGIN;
@@ -38,7 +37,6 @@ public class ConstantesAPI {
     //ENDPOINTS VAULT
     public static final String ENDPOINT_VAULT = PATH_VAULTS;
     public static final String ENDPOINT_VAULT_GET = PATH_VAULTS + VAULT_PATH;
-    public static final String ENDPOINT_VAULT_CHANGE_PASSWORD = PATH_VAULTS + VAULT_CHANGE_PASSWORD_PATH;
     public static final String ENDPOINT_VAULT_DELETE = PATH_VAULTS + VAULT_ID_PATH_PARAM;
     public static final String ENDPOINT_VAULT_SHARE = PATH_VAULTS + SHARE_PATH;
 
@@ -57,7 +55,6 @@ public class ConstantesAPI {
     //Roles
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_USER = "USER";
-    public static final String PASS_ENC_WITH_USER_PUB_KEY_PARAM = "passEncWithUserPubKey";
 
     private ConstantesAPI() {
     }

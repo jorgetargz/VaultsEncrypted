@@ -38,12 +38,6 @@ public class VaultsManagementController extends BaseScreenController {
     @FXML
     private MFXPasswordField txtPasswordMyVault;
     @FXML
-    private MFXComboBox<Vault> cmbChangePassMyVaults;
-    @FXML
-    private MFXPasswordField txtVaultOldPassword;
-    @FXML
-    private MFXPasswordField txtVaultNewPassword;
-    @FXML
     private MFXComboBox<Vault> cmbDeleteMyVaults;
 
     @Inject
@@ -69,7 +63,6 @@ public class VaultsManagementController extends BaseScreenController {
                 Platform.runLater(() -> {
                     cmbDeleteMyVaults.getItems().setAll(newState.vaultsOwned());
                     cmbOpenMyVaults.getItems().setAll(newState.vaultsOwned());
-                    cmbChangePassMyVaults.getItems().setAll(newState.vaultsOwned());
                 });
             }
             if (newState.vaultToOpen() != null) {
@@ -103,11 +96,6 @@ public class VaultsManagementController extends BaseScreenController {
     @FXML
     private void openOtherUserVault() {
         vaultsManagementViewModel.openOtherUserVault(txtUsernameOwner.getText(), txtNameVaultOther.getText(), txtPasswordOther.getText());
-    }
-
-    @FXML
-    private void changePassword() {
-        vaultsManagementViewModel.changePassword(cmbChangePassMyVaults.getValue(), txtVaultOldPassword.getText(), txtVaultNewPassword.getText());
     }
 
     @FXML

@@ -41,11 +41,6 @@ public class VaultsDAOImpl extends GenericDAO implements VaultDAO {
     }
 
     @Override
-    public Single<Either<String, Boolean>> changePassword(Vault credentials, String password) {
-        return safeAPICallResponseVoid(vaultAPI.changePassword(credentials, password));
-    }
-
-    @Override
     public Single<Either<String, Boolean>> delete(int vaultId) {
         return safeAPICallResponseVoid(vaultAPI.deleteVault(vaultId));
     }

@@ -66,14 +66,6 @@ public class RESTVault {
         return servicesVaults.shareVault(vault, username, passwordEncWithUserPubKey, securityContext.getUserPrincipal().getName());
     }
 
-    @POST
-    @RolesAllowed(ConstantesAPI.ROLE_USER)
-    @Path(ConstantesAPI.VAULT_CHANGE_PASSWORD_PATH)
-    public Response changePassword(Vault credentials, @QueryParam(ConstantesAPI.PASSWORD) String password) {
-        servicesVaults.changePassword(credentials, password, securityContext.getUserPrincipal().getName());
-        return Response.ok().build();
-    }
-
     @DELETE
     @RolesAllowed(ConstantesAPI.ROLE_USER)
     @Path(ConstantesAPI.VAULT_ID_PATH_PARAM)

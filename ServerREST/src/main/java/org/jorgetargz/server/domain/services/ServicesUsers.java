@@ -7,6 +7,8 @@ public interface ServicesUsers {
 
     User scGet(String username);
 
+    User scGetBase64(String username);
+
     User scSave(User user);
 
     void scLogout(String authorization);

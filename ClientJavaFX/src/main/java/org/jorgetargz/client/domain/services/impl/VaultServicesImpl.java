@@ -173,7 +173,8 @@ public class VaultServicesImpl implements VaultServices {
     @Override
     public Single<Either<String, Vault>> share(Vault vault, String username) {
         CompletableFuture<User> userCompletableFuture = new CompletableFuture<>();
-        usersDAO.get(username)
+        String usernameBase64 = Base64.getUrlEncoder().encodeToString(username.getBytes());
+        usersDAO.get(usernameBase64)
                 .subscribe(either -> {
                     if (either.isLeft()) {
                         userCompletableFuture.completeExceptionally(
@@ -201,22 +202,13 @@ public class VaultServicesImpl implements VaultServices {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("Error al encriptar la clave del vault con la clave privada");
+            throw new RuntimeException("Error al encriptar la clave del vault con la clave publica del usuario");
         }
 
         //Se codifica la clave encriptada con Base64
-        String passwordEncWithUserPubKey = Base64.getUrlEncoder().encodeToString(vaultPasswordEncryptedBytes);
+        String passwordEncWithUserPubKeyBase64 = Base64.getUrlEncoder().encodeToString(vaultPasswordEncryptedBytes);
 
-        //Se codifica el username con Base64
-        username = Base64.getUrlEncoder().encodeToString(username.getBytes());
-
-        return vaultDAO.share(vault, username, passwordEncWithUserPubKey);
-    }
-
-    @Override
-    public Single<Either<String, Boolean>> changePassword(Vault credentials, String password) {
-        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
-        return vaultDAO.changePassword(credentials, password);
+        return vaultDAO.share(vault, usernameBase64, passwordEncWithUserPubKeyBase64);
     }
 
     @Override

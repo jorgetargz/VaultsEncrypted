@@ -2,7 +2,6 @@ package org.jorgetargz.server.domain.services.impl;
 
 
 import jakarta.inject.Inject;
-import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import lombok.extern.log4j.Log4j2;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -45,17 +44,15 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
     private final JWTBlackList jwtBlackList;
     private final EncriptacionAES encriptacionAES;
     private final KeyPair keyPair;
-    private final Pbkdf2PasswordHash passwordHash;
 
     @Inject
     public ServicesUsersImpl(UsersDao daoLogin, JWTBlackList jwtBlackList,
-                             EncriptacionAES encriptacionAES, KeyPair keyPair,
-                             Pbkdf2PasswordHash passwordHash) {
+                             EncriptacionAES encriptacionAES, KeyPair keyPair
+    ) {
         this.daoLogin = daoLogin;
         this.jwtBlackList = jwtBlackList;
         this.encriptacionAES = encriptacionAES;
         this.keyPair = keyPair;
-        this.passwordHash = passwordHash;
     }
 
     @Override
@@ -68,8 +65,17 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
     }
 
     @Override
+    public User scGetBase64(String username) {
+        if (username == null) {
+            log.warn(Constantes.USERNAME_EMPTY);
+            throw new ValidationException(Constantes.USERNAME_OR_PASSWORD_EMPTY);
+        }
+        username = new String(Base64.getUrlDecoder().decode(username));
+        return daoLogin.get(username);
+    }
+
+    @Override
     public User scSave(User user) {
-        user.setPassword(passwordHash.generate(user.getPassword().toCharArray()));
         ContentCiphedAES publicKeyEncrypted = user.getPublicKeyEncrypted();
         String passwordEncryptedBase64 = user.getEncryptedPasswordOfPublicKeyEncrypted();
 
