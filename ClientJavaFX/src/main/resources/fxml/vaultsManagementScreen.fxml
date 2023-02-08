@@ -1,44 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import io.github.palexdev.materialfx.controls.*?>
-<?import javafx.scene.control.*?>
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXPasswordField?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import io.github.palexdev.materialfx.controls.MFXToggleButton?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane prefHeight="650.0" prefWidth="980.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.jorgetargz.client.gui.screens.vault_management.VaultsManagementController">
 
-    <Label layoutX="94.0" layoutY="86.0" text="%OpenVault"/>
-    <MFXComboBox fx:id="cmbOpenMyVaults" layoutX="98.0" layoutY="114.0" prefHeight="55.0" prefWidth="290.0"/>
-    <MFXPasswordField fx:id="txtPasswordMyVault" layoutX="416.0" layoutY="108.0" prefHeight="66.0" prefWidth="198.0"
-                      promptText="%PasswordRequired"/>
-    <MFXButton layoutX="647.0" layoutY="124.0" mnemonicParsing="false" onAction="#openMyVault" prefHeight="34.0"
-               prefWidth="166.0" text="%Open"/>
+<AnchorPane prefHeight="650.0" prefWidth="980.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jorgetargz.client.gui.screens.vault_management.VaultsManagementController">
 
-    <Label layoutX="95.0" layoutY="230.0" text="%CreateVault"/>
-    <MFXTextField fx:id="txtNameVaultCreate" floatMode="BORDER" layoutX="101.0" layoutY="255.0" prefHeight="54.0"
-                  prefWidth="206.0" promptText="%VaultName"/>
-    <MFXPasswordField fx:id="txtPasswordCreate" layoutX="326.0" layoutY="249.0" prefHeight="66.0" prefWidth="198.0"
-                      promptText="%PasswordRequired"/>
-    <MFXToggleButton fx:id="readByAll" layoutX="564.0" layoutY="238.0" text="%ReadAll"/>
-    <MFXToggleButton fx:id="writeByAll" layoutX="564.0" layoutY="294.0" text="%WriteAll"/>
-    <MFXButton layoutX="718.0" layoutY="267.0" mnemonicParsing="false" onAction="#createVault" prefHeight="34.0"
-               prefWidth="166.0" text="%Create"/>
+    <Label layoutX="94.0" layoutY="86.0" text="%OpenVault" />
+    <MFXComboBox fx:id="cmbOpenMyVaults" layoutX="98.0" layoutY="114.0" prefHeight="55.0" prefWidth="290.0" />
+    <MFXPasswordField fx:id="txtPasswordMyVault" layoutX="416.0" layoutY="108.0" prefHeight="66.0" prefWidth="198.0" promptText="%PasswordRequired" />
+    <MFXButton layoutX="647.0" layoutY="124.0" mnemonicParsing="false" onAction="#openMyVault" prefHeight="34.0" prefWidth="166.0" text="%Open" />
 
-    <Label layoutX="91.0" layoutY="371.0" text="%OpenOtherUserVault"/>
-    <MFXTextField fx:id="txtNameVaultOther" floatMode="BORDER" layoutX="97.0" layoutY="396.0" prefHeight="54.0"
-                  prefWidth="206.0" promptText="%VaultName"/>
-    <MFXTextField fx:id="txtUsernameOwner" floatMode="BORDER" layoutX="538.0" layoutY="396.0" prefHeight="54.0"
-                  prefWidth="198.0" promptText="%Username"/>
-    <MFXPasswordField fx:id="txtPasswordOther" layoutX="324.0" layoutY="390.0" prefHeight="66.0" prefWidth="198.0"
-                      promptText="%PasswordRequired"/>
-    <MFXButton layoutX="759.0" layoutY="406.0" mnemonicParsing="false" onAction="#openOtherUserVault" prefHeight="34.0"
-               prefWidth="166.0" text="%Open"/>
+    <Label layoutX="95.0" layoutY="230.0" text="%CreateVault" />
+    <MFXTextField fx:id="txtNameVaultCreate" floatMode="BORDER" layoutX="101.0" layoutY="255.0" prefHeight="54.0" prefWidth="206.0" promptText="%VaultName" />
+    <MFXPasswordField fx:id="txtPasswordCreate" layoutX="326.0" layoutY="249.0" prefHeight="66.0" prefWidth="198.0" promptText="%PasswordRequired" />
+    <MFXToggleButton fx:id="readByAll" layoutX="564.0" layoutY="234.0" text="%ReadAll" />
+    <MFXToggleButton fx:id="writeByAll" layoutX="564.0" layoutY="288.0" text="%WriteAll" />
+    <MFXButton layoutX="718.0" layoutY="267.0" mnemonicParsing="false" onAction="#createVault" prefHeight="34.0" prefWidth="166.0" text="%Create" />
 
-    <Label layoutX="91.0" layoutY="500.0" text="%DeleteVault"/>
-    <MFXComboBox fx:id="cmbDeleteMyVaults" layoutX="97.0" layoutY="524.0" prefHeight="55.0" prefWidth="226.0"/>
-    <MFXButton layoutX="357.0" layoutY="534.0" mnemonicParsing="false" onAction="#doDelete" prefHeight="34.0"
-               prefWidth="166.0" text="%Delete"/>
-    <Label layoutX="674.0" layoutY="522.0" text="privada:privada:jorge"/>
-    <Label layoutX="674.0" layoutY="550.0" text="publica lectura:publica:jorge"/>
-    <Label layoutX="674.0" layoutY="578.0" text="publica escritura:publica:jorge"/>
+    <Label layoutX="91.0" layoutY="371.0" text="%OpenOtherUserVault" />
+    <MFXTextField fx:id="txtNameVaultOther" floatMode="BORDER" layoutX="97.0" layoutY="396.0" prefHeight="54.0" prefWidth="206.0" promptText="%VaultName" />
+    <MFXTextField fx:id="txtUsernameOwner" floatMode="BORDER" layoutX="538.0" layoutY="396.0" prefHeight="54.0" prefWidth="198.0" promptText="%Username" />
+    <MFXPasswordField fx:id="txtPasswordOther" layoutX="324.0" layoutY="390.0" prefHeight="66.0" prefWidth="198.0" promptText="%PasswordRequired" />
+    <MFXButton layoutX="759.0" layoutY="406.0" mnemonicParsing="false" onAction="#openOtherUserVault" prefHeight="34.0" prefWidth="166.0" text="%Open" />
+
+    <Label layoutX="91.0" layoutY="500.0" text="%DeleteVault" />
+    <MFXComboBox fx:id="cmbDeleteMyVaults" layoutX="97.0" layoutY="524.0" prefHeight="55.0" prefWidth="226.0" />
+    <MFXButton layoutX="357.0" layoutY="534.0" mnemonicParsing="false" onAction="#doDelete" prefHeight="34.0" prefWidth="166.0" text="%Delete" />
+    <Label layoutX="674.0" layoutY="522.0" text="privada:privada:jorge" />
+    <Label layoutX="674.0" layoutY="550.0" text="publica lectura:publica:jorge" />
+    <Label layoutX="674.0" layoutY="578.0" text="publica escritura:publica:jorge" />
 
 </AnchorPane>

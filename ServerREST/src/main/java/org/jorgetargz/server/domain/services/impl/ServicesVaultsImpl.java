@@ -54,12 +54,11 @@ public class ServicesVaultsImpl implements ServicesVaults {
         Vault vault = vaultsDao.getVault(username, name);
         boolean isOwner = vault.getUsernameOwner().equals(usernameLogged);
         if (isOwner || vault.isReadByAll()) {
-            if (isOwner) return vault;
-            else {
+            if (!isOwner) {
                 String vaultKey = vaultsDao.getVaultKeyForUser(vault.getId(), usernameLogged);
                 vault.setKey(vaultKey);
-                return vault;
             }
+            return vault;
         } else {
             throw new ValidationException(Constantes.ONLY_THE_OWNER_CAN_READ_THIS_VAULT);
         }
