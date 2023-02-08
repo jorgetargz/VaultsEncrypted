@@ -21,18 +21,18 @@ public class MessagesDAOImpl extends GenericDAO implements MessagesDAO {
     }
 
     @Override
-    public Single<Either<String, List<Message>>> getAll(String vaultName, String username, String password) {
-        return safeAPICall(messagesAPI.getMessages(vaultName, username, password));
+    public Single<Either<String, List<Message>>> getAll(String vaultName, String username) {
+        return safeAPICall(messagesAPI.getMessages(vaultName, username));
     }
 
     @Override
-    public Single<Either<String, Message>> save(Message message, String password) {
-        return safeAPICall(messagesAPI.create(message, password));
+    public Single<Either<String, Message>> save(Message message) {
+        return safeAPICall(messagesAPI.create(message));
     }
 
     @Override
-    public Single<Either<String, Message>> update(Message message, String password) {
-        return safeAPICall(messagesAPI.update(message, password));
+    public Single<Either<String, Message>> update(Message message) {
+        return safeAPICall(messagesAPI.update(message));
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.jorgetargz.server.domain.services.impl;
 
 import jakarta.inject.Inject;
-import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import org.jorgetargz.server.dao.MessagesDao;
 import org.jorgetargz.server.dao.VaultsDao;
 import org.jorgetargz.server.domain.common.Constantes;
@@ -17,58 +16,45 @@ public class ServicesMessagesImpl implements ServicesMessages {
 
     private final MessagesDao messageDao;
     private final VaultsDao vaultsDao;
-    private final Pbkdf2PasswordHash passwordHash;
     private final Base64.Decoder decoder;
 
     @Inject
-    public ServicesMessagesImpl(MessagesDao messageDao, VaultsDao vaultsDao, Pbkdf2PasswordHash passwordHash) {
+    public ServicesMessagesImpl(MessagesDao messageDao, VaultsDao vaultsDao) {
         this.messageDao = messageDao;
         this.vaultsDao = vaultsDao;
-        this.passwordHash = passwordHash;
         this.decoder = Base64.getUrlDecoder();
     }
 
     @Override
-    public List<Message> getMessages(Vault credentials, String usernameReader) {
-        String password = new String(decoder.decode(credentials.getKey()));
-        String username = new String(decoder.decode(credentials.getUsernameOwner()));
-        String name = new String(decoder.decode(credentials.getName()));
+    public List<Message> getMessages(Vault vaultInfo, String usernameReader) {
+        String username = new String(decoder.decode(vaultInfo.getUsernameOwner()));
+        String name = new String(decoder.decode(vaultInfo.getName()));
         Vault vault = vaultsDao.getVault(username, name);
-        if (passwordHash.verify(password.toCharArray(), vault.getKey())) {
-            if (vault.getUsernameOwner().equals(usernameReader) || vault.isReadByAll()) {
-                return messageDao.getMessages(vault.getId());
-            } else {
-                throw new ValidationException(Constantes.YOU_DON_T_HAVE_PERMISSION_TO_READ_THIS_VAULT);
-            }
+        if (vault.getUsernameOwner().equals(usernameReader) || vault.isReadByAll()) {
+            return messageDao.getMessages(vault.getId());
         } else {
-            throw new ValidationException(Constantes.WRONG_CREDENTIALS);
+            throw new ValidationException(Constantes.YOU_DON_T_HAVE_PERMISSION_TO_READ_THIS_VAULT);
         }
     }
 
     @Override
-    public Message createMessage(Message message, String password, String usernameReader) {
+    public Message createMessage(Message message, String usernameReader) {
         int vaultId = message.getIdVault();
         Vault vault = vaultsDao.getVault(vaultId);
-        password = new String(decoder.decode(password));
-        checkPermsionToWrite(vault, password, usernameReader);
+        checkPermsionToWrite(vault, usernameReader);
         return messageDao.createMessage(vaultId, message);
     }
 
     @Override
-    public Message updateMessage(Message message, String password, String usernameReader) {
-        password = new String(decoder.decode(password));
-        checkPermsionToWrite(vaultsDao.getVault(message.getIdVault()), password, usernameReader);
+    public Message updateMessage(Message message, String usernameReader) {
+        checkPermsionToWrite(vaultsDao.getVault(message.getIdVault()), usernameReader);
         return messageDao.updateMessage(message);
     }
 
-    private void checkPermsionToWrite(Vault vault, String password, String usernameReader) {
-        if (passwordHash.verify(password.toCharArray(), vault.getKey())) {
+    private void checkPermsionToWrite(Vault vault, String usernameReader) {
             if (!vault.getUsernameOwner().equals(usernameReader) && !vault.isWriteByAll()) {
                 throw new ValidationException(Constantes.ONLY_THE_OWNER_OF_THE_VAULT_CAN_WRITE_IN_IT);
             }
-        } else {
-            throw new ValidationException(Constantes.WRONG_CREDENTIALS);
-        }
     }
 
     @Override

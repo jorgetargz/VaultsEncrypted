@@ -115,6 +115,41 @@ public class VaultsDaoImpl implements VaultsDao {
     }
 
     @Override
+    public Vault shareVault(Vault vault, String usernameToShare, String passwordEncWithUserPubKey) {
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.INSERT_VAULT_SHARE)) {
+            preparedStatement.setInt(1, vault.getId());
+            preparedStatement.setString(2, usernameToShare);
+            preparedStatement.setString(3, passwordEncWithUserPubKey);
+            if (preparedStatement.executeUpdate() != 1) {
+                throw new NotFoundException(Constantes.VAULT_NOT_FOUND);
+            }
+            return vault;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new DatabaseException(Constantes.DATABASE_ERROR);
+        }
+    }
+
+    @Override
+    public String getVaultKeyForUser(int vaultId, String usernameLogged) {
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.SELECT_VAULT_KEY_FOR_USER)) {
+            preparedStatement.setInt(1, vaultId);
+            preparedStatement.setString(2, usernameLogged);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString(Constantes.KEY);
+            } else {
+                throw new NotFoundException(Constantes.VAULT_NOT_FOUND);
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new DatabaseException(Constantes.DATABASE_ERROR);
+        }
+    }
+
+    @Override
     public void changePassword(int vaultId, String newPassword) {
         try (Connection connection = dbConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.UPDATE_VAULT_KEY_QUERY)) {

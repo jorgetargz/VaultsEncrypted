@@ -9,9 +9,9 @@ public interface ServicesMessages {
 
     List<Message> getMessages(Vault credential, String usernameReader);
 
-    Message createMessage(Message message, String password, String usernameReader);
+    Message createMessage(Message message, String usernameReader);
 
-    Message updateMessage(Message message, String password, String usernameReader);
+    Message updateMessage(Message message, String usernameReader);
 
     void deleteMessage(int messageId, String usernameReader);
 }

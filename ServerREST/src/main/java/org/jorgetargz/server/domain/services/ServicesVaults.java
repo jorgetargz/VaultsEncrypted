@@ -6,13 +6,15 @@ import java.util.List;
 
 public interface ServicesVaults {
 
-    List<Vault> getVaults(String username);
+    List<Vault> getVaults(String usernameLogged);
 
-    Vault getVault(Vault credentials, String usernameReader);
+    Vault getVault(Vault vaultInfo, String usernameLogged);
 
     Vault createVault(Vault vault);
 
-    void changePassword(Vault credentials, String password, String usernameReader);
+    Vault shareVault(Vault vaultInfo, String usernameToShare, String passwordEncWithUserPubKey, String usernameLogged);
 
-    void deleteVault(int vaultId, String usernameReader);
+    void changePassword(Vault vaultInfo, String password, String usernameLogged);
+
+    void deleteVault(int vaultId, String usernameLogged);
 }

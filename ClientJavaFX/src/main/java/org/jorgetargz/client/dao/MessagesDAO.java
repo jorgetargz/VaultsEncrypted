@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface MessagesDAO {
 
-    Single<Either<String, List<Message>>> getAll(String vaultName, String username, String password);
+    Single<Either<String, List<Message>>> getAll(String vaultName, String username);
 
-    Single<Either<String, Message>> save(Message message, String password);
+    Single<Either<String, Message>> save(Message message);
 
-    Single<Either<String, Message>> update(Message message, String password);
+    Single<Either<String, Message>> update(Message message);
 
     Single<Either<String, Boolean>> delete(int messageId);
 }

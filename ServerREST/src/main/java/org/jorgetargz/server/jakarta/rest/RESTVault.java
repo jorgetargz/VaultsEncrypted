@@ -38,11 +38,13 @@ public class RESTVault {
     @GET
     @RolesAllowed(ConstantesAPI.ROLE_USER)
     @Path(ConstantesAPI.VAULT_PATH)
-    public Vault getVault(@QueryParam(ConstantesAPI.VAULT_NAME) String vaultName, @QueryParam(ConstantesAPI.USERNAME_OWNER) String usernameOwner, @QueryParam(ConstantesAPI.PASSWORD) String password) {
+    public Vault getVault(
+            @QueryParam(ConstantesAPI.VAULT_NAME) String vaultName,
+            @QueryParam(ConstantesAPI.USERNAME_OWNER) String usernameOwner
+    ) {
         Vault credentials = Vault.builder()
                 .name(vaultName)
                 .usernameOwner(usernameOwner)
-                .key(password)
                 .build();
         return servicesVaults.getVault(credentials, securityContext.getUserPrincipal().getName());
     }
@@ -51,6 +53,17 @@ public class RESTVault {
     @RolesAllowed(ConstantesAPI.ROLE_USER)
     public Vault createVault(Vault vault) {
         return servicesVaults.createVault(vault);
+    }
+
+    @POST
+    @Path(ConstantesAPI.SHARE_PATH)
+    @RolesAllowed(ConstantesAPI.ROLE_USER)
+    public Vault shareVault(
+            Vault vault,
+            @QueryParam(ConstantesAPI.USERNAME_PARAM) String username,
+            @QueryParam(ConstantesAPI.PASS_ENC_WITH_USER_PUB_KEY_PARAM) String passwordEncWithUserPubKey
+    ) {
+        return servicesVaults.shareVault(vault, username, passwordEncWithUserPubKey, securityContext.getUserPrincipal().getName());
     }
 
     @POST

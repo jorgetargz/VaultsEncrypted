@@ -25,6 +25,8 @@ public class VaultController extends BaseScreenController {
     private MFXTextField txtMessageUpdate;
     @FXML
     private MFXComboBox<Message> cmbMessages;
+    @FXML
+    private MFXTextField txtUsernameToShare;
 
     @FXML
     private TableView<Message> tableMessages;
@@ -89,5 +91,18 @@ public class VaultController extends BaseScreenController {
     @FXML
     private void deleteMessage() {
         vaultsViewModel.deleteMessage(getPrincipalController().getVault(), cmbMessages.getValue());
+    }
+
+    @FXML
+    private void updateMessageField() {
+        Message message = tableMessages.getSelectionModel().getSelectedItem();
+        txtMessageUpdate.setText(message.getContentUnsecured());
+    }
+
+
+    @FXML
+    private void share() {
+        String userToShare = txtUsernameToShare.getText();
+        vaultsViewModel.share(getPrincipalController().getVault(), userToShare);
     }
 }

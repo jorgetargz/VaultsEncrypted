@@ -39,6 +39,7 @@ public class LoginViewModel {
                         state.set(new LoginState(null, either.getLeft(), false,true));
                     else {
                         cacheAuthorization.setPassword(password);
+                        cacheAuthorization.setUser(username);
                         state.set(new LoginState(either.get(), null, false, true));
                     }
                 });

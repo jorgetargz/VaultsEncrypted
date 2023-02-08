@@ -16,6 +16,7 @@ public class ConstantesAPI {
     public static final String VAULT_CHANGE_PASSWORD_PATH = "changePassword/";
     public static final String VAULT_PATH = "vault/";
     public static final String PUBLIC_KEY_PATH = "publicKey/";
+    public static final String SHARE_PATH = "share/";
 
     //Path Parameters
     public static final String VAULT_ID_PATH_PARAM = "{vaultId}";
@@ -39,6 +40,7 @@ public class ConstantesAPI {
     public static final String ENDPOINT_VAULT_GET = PATH_VAULTS + VAULT_PATH;
     public static final String ENDPOINT_VAULT_CHANGE_PASSWORD = PATH_VAULTS + VAULT_CHANGE_PASSWORD_PATH;
     public static final String ENDPOINT_VAULT_DELETE = PATH_VAULTS + VAULT_ID_PATH_PARAM;
+    public static final String ENDPOINT_VAULT_SHARE = PATH_VAULTS + SHARE_PATH;
 
     //ENDPOINTS MESSAGES
     public static final String ENDPOINT_MESSAGES = PATH_MESSAGES;
@@ -46,6 +48,7 @@ public class ConstantesAPI {
 
     //ENDPOINTS USERS
     public static final String ENDPOINT_USERS = PATH_USERS;
+    public static final String ENDPOINT_GET_USER = PATH_USERS + USERNAME_PATH_PARAM;
     public static final String ENDPOINT_USER_DELETE = PATH_USERS + USERNAME_PATH_PARAM;
 
     //ENDPOINTS SECURITY
@@ -54,6 +57,7 @@ public class ConstantesAPI {
     //Roles
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_USER = "USER";
+    public static final String PASS_ENC_WITH_USER_PUB_KEY_PARAM = "passEncWithUserPubKey";
 
     private ConstantesAPI() {
     }

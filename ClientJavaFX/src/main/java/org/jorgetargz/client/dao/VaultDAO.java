@@ -10,9 +10,11 @@ public interface VaultDAO {
 
     Single<Either<String, List<Vault>>> getAll();
 
-    Single<Either<String, Vault>> get(String vaultName, String username, String password);
+    Single<Either<String, Vault>> get(String vaultName, String username);
 
     Single<Either<String, Vault>> save(Vault vault);
+
+    Single<Either<String, Vault>> share(Vault vault, String username, String passwordEncWithUserPubKey);
 
     Single<Either<String, Boolean>> changePassword(Vault credentials, String password);
 

@@ -13,6 +13,10 @@ public interface VaultsDao {
 
     Vault createVault(Vault vault);
 
+    Vault shareVault(Vault vault, String usernameToShare, String passwordEncWithUserPubKey);
+
+    String getVaultKeyForUser(int vaultId, String usernameLogged);
+
     void changePassword(int vaultId, String newPassword);
 
     void deleteVault(int vaultId);

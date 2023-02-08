@@ -35,8 +35,8 @@ public class ServicesVaultsImpl implements ServicesVaults {
     }
 
     @Override
-    public List<Vault> getVaults(String username) {
-        return vaultsDao.getVaults(username);
+    public List<Vault> getVaults(String usernameLogged) {
+        return vaultsDao.getVaults(usernameLogged);
     }
 
     @Override
@@ -45,33 +45,45 @@ public class ServicesVaultsImpl implements ServicesVaults {
     }
 
     @Override
-    public Vault getVault(Vault credentials, String usernameReader) {
-        String password = new String(decoder.decode(credentials.getKey()));
-        String username = new String(decoder.decode(credentials.getUsernameOwner()));
-        String name = new String(decoder.decode(credentials.getName()));
-        Vault vault = vaultsDao.getVault(username, name);
-        if (passwordHash.verify(password.toCharArray(), vault.getKey())) {
-            if (vault.getUsernameOwner().equals(usernameReader) || vault.isReadByAll()) {
-                return vault;
-            } else {
-                throw new ValidationException(Constantes.ONLY_THE_OWNER_CAN_READ_THIS_VAULT);
-            }
+    public Vault shareVault(Vault vaultInfo, String usernameToShare, String passwordEncWithUserPubKey, String usernameLogged) {
+        Vault vault = vaultsDao.getVault(vaultInfo.getUsernameOwner(), vaultInfo.getName());
+        if (vault.getUsernameOwner().equals(usernameLogged)) {
+            usernameToShare = new String(decoder.decode(usernameToShare));
+            return vaultsDao.shareVault(vault, usernameToShare, passwordEncWithUserPubKey);
         } else {
-            throw new ValidationException(Constantes.WRONG_CREDENTIALS);
+            throw new ValidationException("Only owner can share the vault");
         }
     }
 
     @Override
-    public void changePassword(Vault credentials, String password, String usernameReader) {
-        String newPassword = new String(Base64.getUrlDecoder().decode(password));
-        int vaultId = credentials.getId();
+    public Vault getVault(Vault vaultInfo, String usernameLogged) {
+        String username = new String(decoder.decode(vaultInfo.getUsernameOwner()));
+        String name = new String(decoder.decode(vaultInfo.getName()));
+        Vault vault = vaultsDao.getVault(username, name);
+        boolean isOwner = vault.getUsernameOwner().equals(usernameLogged);
+        if (isOwner || vault.isReadByAll()) {
+            if (isOwner) return vault;
+            else {
+                String vaultKey = vaultsDao.getVaultKeyForUser(vault.getId(), usernameLogged);
+                vault.setKey(vaultKey);
+                return vault;
+            }
+        } else {
+            throw new ValidationException(Constantes.ONLY_THE_OWNER_CAN_READ_THIS_VAULT);
+        }
+    }
+
+    @Override
+    public void changePassword(Vault vaultInfo, String password, String usernameLogged) {
+        String newPassword = new String(decoder.decode(password));
+        int vaultId = vaultInfo.getId();
         Vault vault = vaultsDao.getVault(vaultId);
-        if (passwordHash.verify(credentials.getKey().toCharArray(), vault.getKey())
-                && vault.getUsernameOwner().equals(usernameReader)) {
+        if (passwordHash.verify(vaultInfo.getKey().toCharArray(), vault.getKey())
+                && vault.getUsernameOwner().equals(usernameLogged)) {
 
             List<Message> messages = messageDao.getMessages(vaultId);
             for (Message message : messages) {
-                String messageText = encriptacionAES.desencriptar(message.getContentCiphedAES(), credentials.getKey());
+                String messageText = encriptacionAES.desencriptar(message.getContentCiphedAES(), vaultInfo.getKey());
                 ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(messageText, newPassword);
                 message.setContentCiphedAES(contentCiphedAES);
                 messageDao.updateMessage(message);
@@ -85,9 +97,9 @@ public class ServicesVaultsImpl implements ServicesVaults {
     }
 
     @Override
-    public void deleteVault(int vaultId, String usernameReader) {
+    public void deleteVault(int vaultId, String usernameLogged) {
         Vault vault = vaultsDao.getVault(vaultId);
-        if (vault.getUsernameOwner().equals(usernameReader)) {
+        if (vault.getUsernameOwner().equals(usernameLogged)) {
             vaultsDao.deleteVault(vaultId);
         } else {
             throw new ValidationException(Constantes.ONLY_THE_OWNER_OF_THE_VAULT_CAN_DELETE_IT);

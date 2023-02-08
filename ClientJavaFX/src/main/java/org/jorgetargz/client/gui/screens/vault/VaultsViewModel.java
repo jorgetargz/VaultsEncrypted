@@ -6,6 +6,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.jorgetargz.client.domain.services.MessagesServices;
+import org.jorgetargz.client.domain.services.VaultServices;
 import org.jorgetargz.client.gui.screens.common.ScreenConstants;
 import org.jorgetargz.utils.modelo.Message;
 import org.jorgetargz.utils.modelo.Vault;
@@ -13,11 +14,13 @@ import org.jorgetargz.utils.modelo.Vault;
 public class VaultsViewModel {
 
     private final MessagesServices messageServices;
+    private final VaultServices vaultServices;
     private final ObjectProperty<VaultState> state;
 
     @Inject
-    public VaultsViewModel(MessagesServices messageServices) {
+    public VaultsViewModel(MessagesServices messageServices, VaultServices vaultServices) {
         this.messageServices = messageServices;
+        this.vaultServices = vaultServices;
         state = new SimpleObjectProperty<>(new VaultState(null, null,  false, false, false));
     }
 
@@ -89,6 +92,23 @@ public class VaultsViewModel {
                         else {
                             state.set(new VaultState(null, null, true, false, true));
                             loadMessages(vault);
+                        }
+                    });
+        } else {
+            state.set(new VaultState(ScreenConstants.FILL_ALL_THE_INPUTS, null, false, false, true));
+        }
+    }
+
+    public void share(Vault vault, String userToShare) {
+        if (vault != null && userToShare != null && !userToShare.isEmpty()) {
+            state.set(new VaultState(null, null, false, true, false));
+            vaultServices.share(vault, userToShare)
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(either -> {
+                        if (either.isLeft())
+                            state.set(new VaultState(either.getLeft(), null, false, false, true));
+                        else {
+                            state.set(new VaultState(null, null, true, false, true));
                         }
                     });
         } else {

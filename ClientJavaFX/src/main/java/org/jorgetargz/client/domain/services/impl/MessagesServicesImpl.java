@@ -27,8 +27,7 @@ public class MessagesServicesImpl implements MessagesServices {
     public Single<Either<String, List<Message>>> getAll(String vaultName, String username, String password) {
         vaultName = Base64.getUrlEncoder().encodeToString(vaultName.getBytes());
         username = Base64.getUrlEncoder().encodeToString(username.getBytes());
-        String passwordEncoded = Base64.getUrlEncoder().encodeToString(password.getBytes());
-        return messagesDAO.getAll(vaultName, username, passwordEncoded).map(either -> either.map(messages -> {
+        return messagesDAO.getAll(vaultName, username).map(either -> either.map(messages -> {
             messages.forEach(message ->
                     message.setContentUnsecured(encriptacionAES.desencriptar(message.getContentCiphedAES(), password)));
             return messages;
@@ -38,24 +37,22 @@ public class MessagesServicesImpl implements MessagesServices {
     @Override
     public Single<Either<String, Message>> save(Message message, String password) {
         ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(message.getContentUnsecured(), password);
-        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
         Message messageToSave = Message.builder()
                 .idVault(message.getIdVault())
                 .contentCiphedAES(contentCiphedAES)
                 .build();
-        return messagesDAO.save(messageToSave, password);
+        return messagesDAO.save(messageToSave);
     }
 
     @Override
     public Single<Either<String, Message>> update(Message message, String password) {
         ContentCiphedAES contentCiphedAES = encriptacionAES.encriptar(message.getContentUnsecured(), password);
-        password = Base64.getUrlEncoder().encodeToString(password.getBytes());
         Message messageToUpdate = Message.builder()
                 .id(message.getId())
                 .idVault(message.getIdVault())
                 .contentCiphedAES(contentCiphedAES)
                 .build();
-        return messagesDAO.update(messageToUpdate, password);
+        return messagesDAO.update(messageToUpdate);
     }
 
     @Override

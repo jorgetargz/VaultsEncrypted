@@ -2,10 +2,7 @@ package org.jorgetargz.server.jakarta.rest;
 
 
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.jorgetargz.utils.common.ConstantesAPI;
 
@@ -28,7 +25,7 @@ public class RESTSecurity {
 
     @GET
     @Path(ConstantesAPI.PUBLIC_KEY_PATH)
-    public String getPublicKey() {
+    public String getServerPublicKey() {
         PublicKey clavePublica = rsaKeyPair.getPublic();
         X509EncodedKeySpec x509Spec = new X509EncodedKeySpec(clavePublica.getEncoded());
         return Base64.getUrlEncoder().encodeToString(x509Spec.getEncoded());

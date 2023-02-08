@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.services.VaultServices;
 import org.jorgetargz.client.gui.screens.common.ScreenConstants;
 import org.jorgetargz.utils.modelo.Vault;
@@ -13,13 +12,11 @@ import org.jorgetargz.utils.modelo.Vault;
 public class VaultsManagementViewModel {
 
     private final VaultServices vaultServices;
-    private final CacheAuthorization cacheAuthorization;
     private final ObjectProperty<VaultsManagementState> state;
 
     @Inject
-    public VaultsManagementViewModel(VaultServices vaultServices, CacheAuthorization cacheAuthorization) {
+    public VaultsManagementViewModel(VaultServices vaultServices) {
         this.vaultServices = vaultServices;
-        this.cacheAuthorization = cacheAuthorization;
         state = new SimpleObjectProperty<>(new VaultsManagementState(null, null, null, false, false, false));
     }
 
@@ -79,44 +76,27 @@ public class VaultsManagementViewModel {
     public void openMyVault(Vault vault, String passwordText) {
         if (vault != null && passwordText != null && !passwordText.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
-            vaultServices.get(vault.getName(), vault.getUsernameOwner(), passwordText)
-                    .subscribeOn(Schedulers.single())
-                    .subscribe(either -> {
-                        if (either.isLeft())
-                            state.set(new VaultsManagementState(either.getLeft(), null, null, false, false, true));
-                        else {
-                            Vault credential = Vault.builder()
-                                    .id(either.get().getId())
-                                    .name(vault.getName())
-                                    .usernameOwner(vault.getUsernameOwner())
-                                    .key(passwordText)
-                                    .build();
-                            state.set(new VaultsManagementState(null, null, credential, false, false, true));
-                        }
-                    });
+            try {
+                Vault response = vaultServices.get(vault.getName(), vault.getUsernameOwner(), passwordText);
+                state.set(new VaultsManagementState(null, null, response, false, false, true));
+            } catch (Exception e) {
+                state.set(new VaultsManagementState(e.getMessage(), null, null, false, false, true));
+            }
         } else {
             state.set(new VaultsManagementState(ScreenConstants.FILL_ALL_THE_INPUTS, null, null, false, false, true));
         }
+
     }
 
     public void openOtherUserVault(String usernameOwnerText, String nameVaultText, String passwordText) {
         if (usernameOwnerText != null && !usernameOwnerText.isEmpty() && nameVaultText != null && !nameVaultText.isEmpty() && passwordText != null && !passwordText.isEmpty()) {
             state.set(new VaultsManagementState(null, null, null, false, true, false));
-            vaultServices.get(nameVaultText, usernameOwnerText, passwordText)
-                    .subscribeOn(Schedulers.single())
-                    .subscribe(either -> {
-                        if (either.isLeft())
-                            state.set(new VaultsManagementState(either.getLeft(), null, null, false, false, true));
-                        else {
-                            Vault credential = Vault.builder()
-                                    .id(either.get().getId())
-                                    .name(nameVaultText)
-                                    .usernameOwner(usernameOwnerText)
-                                    .key(passwordText)
-                                    .build();
-                            state.set(new VaultsManagementState(null, null, credential, false, false, true));
-                        }
-                    });
+            try {
+                Vault response = vaultServices.get(nameVaultText, usernameOwnerText, passwordText);
+                state.set(new VaultsManagementState(null, null, response, false, false, true));
+            } catch (Exception e) {
+                state.set(new VaultsManagementState(e.getMessage(), null, null, false, false, true));
+            }
         } else {
             state.set(new VaultsManagementState(ScreenConstants.FILL_ALL_THE_INPUTS, null, null, false, false, true));
         }
@@ -134,7 +114,7 @@ public class VaultsManagementViewModel {
                     .readByAll(readByAll)
                     .writeByAll(writeByAll)
                     .build();
-            vaultServices.save(vault, cacheAuthorization.getPassword())
+            vaultServices.save(vault)
                     .subscribeOn(Schedulers.single())
                     .subscribe(either -> {
                         if (either.isLeft())

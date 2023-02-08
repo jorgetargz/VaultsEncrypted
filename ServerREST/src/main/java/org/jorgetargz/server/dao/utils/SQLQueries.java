@@ -22,6 +22,9 @@ public class SQLQueries {
     public static final String DELETE_MESSAGES_QUERY = "DELETE FROM messages WHERE vaultId = ?";
     public static final String DELETE_MESSAGES_QUERY_BY_USERNAME = "DELETE FROM messages WHERE vaultId IN (SELECT id FROM vaults WHERE username = ?)";
 
+    public static final String INSERT_VAULT_SHARE = "INSERT INTO vaultShares (vaultId, username, `key`) VALUES (?,?,?)";
+    public static final String SELECT_VAULT_KEY_FOR_USER = "SELECT `key` FROM vaultShares WHERE vaultId = ? AND username = ?";
+
     private SQLQueries() {
     }
 

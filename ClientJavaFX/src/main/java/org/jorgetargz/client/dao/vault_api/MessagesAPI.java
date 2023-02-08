@@ -11,15 +11,16 @@ import java.util.List;
 public interface MessagesAPI {
 
     @GET(ConstantesAPI.ENDPOINT_MESSAGES)
-    Single<List<Message>> getMessages(@Query(ConstantesAPI.VAULT_NAME) String vaultName,
-                                      @Query(ConstantesAPI.USERNAME_OWNER) String usernameOwner,
-                                      @Query(ConstantesAPI.PASSWORD) String password);
+    Single<List<Message>> getMessages(
+            @Query(ConstantesAPI.VAULT_NAME) String vaultName,
+            @Query(ConstantesAPI.USERNAME_OWNER) String usernameOwner
+    );
 
     @POST(ConstantesAPI.ENDPOINT_MESSAGES)
-    Single<Message> create(@Body Message message, @Query(ConstantesAPI.PASSWORD) String password);
+    Single<Message> create(@Body Message message);
 
     @PUT(ConstantesAPI.ENDPOINT_MESSAGES)
-    Single<Message> update(@Body Message message, @Query(ConstantesAPI.PASSWORD) String password);
+    Single<Message> update(@Body Message message);
 
     @DELETE(ConstantesAPI.ENDPOINT_MESSAGE_DELETE)
     Single<Response<Void>> delete(@Path(ConstantesAPI.MESSAGE_ID_PARAM) int messageId);

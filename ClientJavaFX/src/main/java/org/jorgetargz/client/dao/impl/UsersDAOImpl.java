@@ -19,6 +19,11 @@ public class UsersDAOImpl extends GenericDAO implements UsersDAO {
     }
 
     @Override
+    public Single<Either<String, User>> get(String username) {
+        return safeAPICall(usersAPI.get(username));
+    }
+
+    @Override
     public Single<Either<String, User>> save(User user) {
         return safeAPICall(usersAPI.create(user));
     }

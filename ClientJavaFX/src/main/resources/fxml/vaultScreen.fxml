@@ -3,23 +3,28 @@
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane prefHeight="650.0" prefWidth="980.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jorgetargz.client.gui.screens.vault.VaultController">
 
-    <TableView fx:id="tableMessages" layoutX="42.0" layoutY="54.0" prefHeight="282.0" prefWidth="922.0">
+    <TableView fx:id="tableMessages" onMouseClicked="#updateMessageField" layoutX="42.0" layoutY="54.0" prefHeight="243.0" prefWidth="922.0">
         <columns>
             <TableColumn fx:id="columnId" prefWidth="104.0" text="%ID" />
             <TableColumn fx:id="columnContent" prefWidth="798.0" text="%Content" />
         </columns>
     </TableView>
-   <MFXTextField fx:id="txtMessageSave" layoutX="42.0" layoutY="365.0" prefHeight="67.0" prefWidth="658.0" />
-   <MFXButton layoutX="720.0" layoutY="365.0" onAction="#saveMessage" prefHeight="67.0" prefWidth="213.0" text="%Save" />
-   <MFXTextField fx:id="txtMessageUpdate" layoutX="45.0" layoutY="456.0" prefHeight="67.0" prefWidth="658.0" />
-   <MFXButton layoutX="720.0" layoutY="456.0" onAction="#updateMessage" prefHeight="67.0" prefWidth="213.0" text="%Update" />
+   <MFXTextField fx:id="txtMessageSave" layoutX="44.0" layoutY="325.0" prefHeight="67.0" prefWidth="658.0" />
+   <MFXButton layoutX="722.0" layoutY="325.0" onAction="#saveMessage" prefHeight="67.0" prefWidth="213.0" text="%Save" />
+   <MFXTextField fx:id="txtMessageUpdate" layoutX="47.0" layoutY="416.0" prefHeight="67.0" prefWidth="658.0" />
+   <MFXButton layoutX="722.0" layoutY="416.0" onAction="#updateMessage" prefHeight="67.0" prefWidth="213.0" text="%Update" />
    <MFXComboBox fx:id="cmbMessages" layoutX="45.0" layoutY="544.0" prefHeight="55.0" prefWidth="136.0" />
    <MFXButton layoutX="205.0" layoutY="544.0" onAction="#deleteMessage" prefHeight="55.0" prefWidth="213.0" text="%Delete" />
+   <MFXTextField fx:id="txtUsernameToShare" layoutX="490.0" layoutY="544.0" prefHeight="47.0" prefWidth="191.0" />
+   <MFXButton onAction="#share" layoutX="705.0" layoutY="543.0" prefHeight="65.0" prefWidth="170.0" text="Share" />
+   <Label layoutX="44.0" layoutY="519.0" text="Id" />
+   <Label layoutX="492.0" layoutY="519.0" prefHeight="18.0" prefWidth="92.0" text="Username" />
 
 </AnchorPane>

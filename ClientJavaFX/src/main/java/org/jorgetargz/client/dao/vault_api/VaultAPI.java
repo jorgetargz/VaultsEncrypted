@@ -14,12 +14,20 @@ public interface VaultAPI {
     Single<List<Vault>> getVaults();
 
     @GET(ConstantesAPI.ENDPOINT_VAULT_GET)
-    Single<Vault> getVault(@Query(ConstantesAPI.VAULT_NAME) String vaultName,
-                           @Query(ConstantesAPI.USERNAME_OWNER) String usernameOwner,
-                           @Query(ConstantesAPI.PASSWORD) String password);
+    Single<Vault> getVault(
+            @Query(ConstantesAPI.VAULT_NAME) String vaultName,
+            @Query(ConstantesAPI.USERNAME_OWNER) String usernameOwner
+    );
 
     @POST(ConstantesAPI.ENDPOINT_VAULT)
     Single<Vault> createVault(@Body Vault vault);
+
+    @POST(ConstantesAPI.ENDPOINT_VAULT_SHARE)
+    Single<Vault> shareVault(
+            @Body Vault vault,
+            @Query(ConstantesAPI.USERNAME_PARAM) String username,
+            @Query(ConstantesAPI.PASS_ENC_WITH_USER_PUB_KEY_PARAM) String passwordEncWithUserPubKey
+    );
 
     @POST(ConstantesAPI.ENDPOINT_VAULT_CHANGE_PASSWORD)
     Single<Response<Void>> changePassword(@Body Vault credentials, @Query(ConstantesAPI.PASSWORD) String password);

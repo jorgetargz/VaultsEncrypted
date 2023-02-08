@@ -31,25 +31,27 @@ public class RESTMessages {
 
     @GET
     @RolesAllowed(ConstantesAPI.ROLE_USER)
-    public List<Message> getMessages(@QueryParam(ConstantesAPI.VAULT_NAME) String vaultName, @QueryParam(ConstantesAPI.USERNAME_OWNER) String usernameOwner, @QueryParam(ConstantesAPI.PASSWORD) String password) {
-        Vault credentials = Vault.builder()
+    public List<Message> getMessages(
+            @QueryParam(ConstantesAPI.VAULT_NAME) String vaultName,
+            @QueryParam(ConstantesAPI.USERNAME_OWNER) String usernameOwner
+    ) {
+        Vault vault = Vault.builder()
                 .name(vaultName)
                 .usernameOwner(usernameOwner)
-                .key(password)
                 .build();
-        return servicesMessages.getMessages(credentials, securityContext.getUserPrincipal().getName());
+        return servicesMessages.getMessages(vault, securityContext.getUserPrincipal().getName());
     }
 
     @POST
     @RolesAllowed(ConstantesAPI.ROLE_USER)
-    public Message createMessage(Message message, @QueryParam(ConstantesAPI.PASSWORD) String password) {
-        return servicesMessages.createMessage(message, password, securityContext.getUserPrincipal().getName());
+    public Message createMessage(Message message) {
+        return servicesMessages.createMessage(message, securityContext.getUserPrincipal().getName());
     }
 
     @PUT
     @RolesAllowed(ConstantesAPI.ROLE_USER)
-    public Message updateMessage(Message message, @QueryParam(ConstantesAPI.PASSWORD) String password) {
-        return servicesMessages.updateMessage(message, password, securityContext.getUserPrincipal().getName());
+    public Message updateMessage(Message message) {
+        return servicesMessages.updateMessage(message, securityContext.getUserPrincipal().getName());
     }
 
     @DELETE

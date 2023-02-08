@@ -26,6 +26,13 @@ public class RESTUsers {
         this.servicesUsers = servicesUsers;
     }
 
+    @GET
+    @Path(ConstantesAPI.USERNAME_PATH_PARAM)
+    @RolesAllowed({ConstantesAPI.ROLE_ADMIN, ConstantesAPI.ROLE_USER})
+    public User get(@PathParam(ConstantesAPI.USERNAME_PARAM) String username) {
+        return servicesUsers.scGet(username);
+    }
+
     @POST
     @RolesAllowed(ConstantesAPI.ROLE_ADMIN)
     public Response create(User user) {
