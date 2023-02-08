@@ -5,6 +5,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.extern.log4j.Log4j2;
 import org.jorgetargz.client.dao.SecurityDAO;
+import org.jorgetargz.client.domain.common.Constantes;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +20,7 @@ public class ServerPublicKeyProducer {
 
     @Produces
     @Singleton
-    @Named("serverPublicKey")
+    @Named(Constantes.SERVER_PUBLIC_KEY)
     public PublicKey getServerPublicKey(SecurityDAO securityDAO) {
         CompletableFuture<PublicKey> publicKeyFuture = new CompletableFuture<>();
         securityDAO.getPublicKey()
@@ -34,12 +35,12 @@ public class ServerPublicKeyProducer {
                         // Se obtiene la clave pública del servidor
                         X509EncodedKeySpec clavePublicaServidorSpec = new X509EncodedKeySpec(clavePublicaServidorBytes);
                         try {
-                            publicKeyFuture.complete(KeyFactory.getInstance("RSA")
+                            publicKeyFuture.complete(KeyFactory.getInstance(Constantes.RSA)
                                     .generatePublic(clavePublicaServidorSpec));
                         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                             log.error(e.getMessage(), e);
                             publicKeyFuture.completeExceptionally(e);
-                            throw new RuntimeException("Error al obtener la clave pública del servidor");
+                            throw new RuntimeException(Constantes.ERROR_AL_OBTENER_LA_CLAVE_PUB_DEL_SERVIDOR);
                         }
                     }
                 });

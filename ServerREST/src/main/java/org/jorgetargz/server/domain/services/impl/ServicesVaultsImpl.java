@@ -38,12 +38,12 @@ public class ServicesVaultsImpl implements ServicesVaults {
         Vault vault = vaultsDao.getVault(vaultInfo.getUsernameOwner(), vaultInfo.getName());
         if (vault.getUsernameOwner().equals(usernameLogged)) {
             if (!vault.isReadByAll()) {
-                throw new ValidationException("This vault can't be shared because it's private");
+                throw new ValidationException(Constantes.THIS_VAULT_CAN_T_BE_SHARED_BECAUSE_IT_S_PRIVATE);
             }
             usernameToShare = new String(decoder.decode(usernameToShare));
             return vaultsDao.shareVault(vault, usernameToShare, passwordEncWithUserPubKey);
         } else {
-            throw new ValidationException("Only owner can share the vault");
+            throw new ValidationException(Constantes.ONLY_OWNER_CAN_SHARE_THE_VAULT);
         }
     }
 

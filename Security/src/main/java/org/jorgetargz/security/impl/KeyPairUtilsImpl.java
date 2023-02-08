@@ -8,10 +8,12 @@ import java.security.NoSuchAlgorithmException;
 
 public class KeyPairUtilsImpl implements KeyPairUtils {
 
+    private static final String RSA = "RSA";
+
     @Override
     public KeyPair generateKeyPair(int keySize) throws NoSuchAlgorithmException {
         KeyPairGenerator generadorRSA4096;
-        generadorRSA4096 = KeyPairGenerator.getInstance("RSA");
+        generadorRSA4096 = KeyPairGenerator.getInstance(RSA);
         generadorRSA4096.initialize(keySize);
         return generadorRSA4096.generateKeyPair();
     }

@@ -14,16 +14,18 @@ import java.security.NoSuchAlgorithmException;
 @Log4j2
 public class EncriptacionRSAImpl implements EncriptacionRSA {
 
+    private static final String RSA_ECB_PKCS_1_PADDING = "RSA/ECB/PKCS1Padding";
+
     @Override
     public byte[] encriptar(byte[] bytes, Key key) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        Cipher cipher = Cipher.getInstance(RSA_ECB_PKCS_1_PADDING);
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return cipher.doFinal(bytes);
     }
 
     @Override
     public byte[] desencriptar(byte[] bytes, Key key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        Cipher cipher = Cipher.getInstance(RSA_ECB_PKCS_1_PADDING);
         cipher.init(Cipher.DECRYPT_MODE, key);
         return cipher.doFinal(bytes);
     }

@@ -79,7 +79,7 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
     }
 
     private CredentialValidationResult certificateAuthentication(String valor) {
-        String[] authenticationFields = valor.split(":");
+        String[] authenticationFields = valor.split(Constantes.SEPARATOR);
         String usernameBase64 = authenticationFields[0];
         String randomStringBase64 = authenticationFields[1];
         String signatureBase64 = authenticationFields[2];
@@ -102,7 +102,7 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
         PublicKey publicKey = certificate.getPublicKey();
         // Se comprueba la firma del randomString con la clave pública del certificado
         try {
-            Signature sign = Signature.getInstance("SHA256WithRSA");
+            Signature sign = Signature.getInstance(Constantes.SHA_256_WITH_RSA);
             sign.initVerify(publicKey);
             sign.update(randomString);
             if (!sign.verify(signature)) {

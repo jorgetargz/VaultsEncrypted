@@ -26,17 +26,23 @@ import java.util.Date;
 @Log4j2
 public class KeyStoreUtilsImpl implements KeyStoreUtils {
 
+    private static final String PKCS_12 = "PKCS12";
+    private static final String CN = "CN=";
+    private static final String SHA_1_WITH_RSA_ENCRYPTION = "SHA1WithRSAEncryption";
+    private static final String PRIVADA = "privada";
+    private static final String PUBLICA = "publica";
+
     @Override
     public KeyStore createKeyStoreWithAutoSignedCert(String keystorePassword, String name, PublicKey publicKey, PrivateKey privateKey) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException, OperatorCreationException {
         KeyStore ks;
-        ks = KeyStore.getInstance("PKCS12");
+        ks = KeyStore.getInstance(PKCS_12);
         ks.load(null, null);
 
         // Se convierte el password en un char[] para poder usarla en el KeyStore
         char[] secretKey = keystorePassword.toCharArray();
 
-        X500Name subject = new X500Name("CN=" + name);
-        X500Name issuer = new X500Name("CN=" + name);
+        X500Name subject = new X500Name(CN + name);
+        X500Name issuer = new X500Name(CN + name);
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer, //issuer
                 BigInteger.valueOf(1), //serial number
@@ -48,31 +54,31 @@ public class KeyStoreUtilsImpl implements KeyStoreUtils {
 
         //Se firma el certificado con la clave privada
         ContentSigner signer;
-        signer = new JcaContentSignerBuilder("SHA1WithRSAEncryption").build(privateKey);
+        signer = new JcaContentSignerBuilder(SHA_1_WITH_RSA_ENCRYPTION).build(privateKey);
 
         //Se obtiene el certificado
         X509Certificate certificate;
         certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
 
         //Se añade la clave privada y el certificado al KeyStore
-        ks.setKeyEntry("privada", privateKey, secretKey, new Certificate[]{certificate});
-        ks.setCertificateEntry("publica", certificate);
+        ks.setKeyEntry(PRIVADA, privateKey, secretKey, new Certificate[]{certificate});
+        ks.setCertificateEntry(PUBLICA, certificate);
 
         return ks;
     }
 
     @Override
     public KeyStore createKeyStore(String keystorePassword, X509Certificate certificate, PrivateKey privateKey) throws CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException {
-        KeyStore ks = KeyStore.getInstance("PKCS12");
+        KeyStore ks = KeyStore.getInstance(PKCS_12);
         ks.load(null, null);
 
         // Se convierte el password en un char[] para poder usarla en el KeyStore
         char[] secretKey = keystorePassword.toCharArray();
 
         //Se guarda el certificado en el KeyStore
-        ks.setCertificateEntry("publica", certificate);
+        ks.setCertificateEntry(PUBLICA, certificate);
         //Se guarda la clave privada en el KeyStore con la misma secretKey que el KeyStore
-        ks.setKeyEntry("privada", privateKey, secretKey, new Certificate[]{certificate});
+        ks.setKeyEntry(PRIVADA, privateKey, secretKey, new Certificate[]{certificate});
 
         return ks;
     }
@@ -80,7 +86,7 @@ public class KeyStoreUtilsImpl implements KeyStoreUtils {
     @Override
     public KeyStore getKeyStore(Path keystorePath, String keystorePassword) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         char[] secretKey = keystorePassword.toCharArray();
-        KeyStore keyStore = KeyStore.getInstance("PKCS12"); //KeySoreException
+        KeyStore keyStore = KeyStore.getInstance(PKCS_12); //KeySoreException
         keyStore.load(Files.newInputStream(keystorePath), secretKey); //IOException, NoSuchAlgorithmException, CertificateException
         return keyStore;
     }

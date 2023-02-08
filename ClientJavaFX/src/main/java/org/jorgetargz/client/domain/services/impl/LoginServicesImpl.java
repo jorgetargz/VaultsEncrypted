@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jorgetargz.client.dao.LoginDAO;
 import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
+import org.jorgetargz.client.domain.common.Constantes;
 import org.jorgetargz.client.domain.services.LoginServices;
 import org.jorgetargz.security.KeyStoreUtils;
 import org.jorgetargz.utils.modelo.User;
@@ -36,10 +37,10 @@ public class LoginServicesImpl implements LoginServices {
     @Override
     public Single<Either<String, User>> scLogin(String username, String password) {
         //Se comprueba si el usuario tiene un KeyStore
-        Path keystorePath = Paths.get(username + "KeyStore.pfx");
+        Path keystorePath = Paths.get(username + Constantes.KEY_STORE_PFX);
         if (!Files.exists(keystorePath)) {
-            log.error("No existe el keystore");
-            return Single.just(Either.left("No existe el keystore"));
+            log.error(Constantes.NO_EXISTE_EL_KEYSTORE);
+            return Single.just(Either.left(Constantes.NO_EXISTE_EL_KEYSTORE));
         }
 
         //Se lee el keyStore del usuario
@@ -48,16 +49,16 @@ public class LoginServicesImpl implements LoginServices {
             keyStore = keyStoreUtils.getKeyStore(keystorePath, password);
         } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
             log.error(e.getMessage(), e);
-            return Single.just(Either.left("Error al leer el KeyStore"));
+            return Single.just(Either.left(Constantes.ERROR_AL_LEER_EL_KEY_STORE));
         }
 
         //Se obtiene la clave privada del KeyStore
         PrivateKey privateKey;
         try {
-            privateKey = keyStoreUtils.getPrivateKey(keyStore, "privada", password);
+            privateKey = keyStoreUtils.getPrivateKey(keyStore, Constantes.PRIVADA_ALIAS, password);
         } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
             log.error(e.getMessage(), e);
-            return Single.just(Either.left("Error al obtener la clave privada del KeyStore"));
+            return Single.just(Either.left(Constantes.ERROR_AL_OBTENER_LA_CLAVE_PRIVADA_DEL_KEY_STORE));
         }
 
         //Se genera un String aleatorio
@@ -66,13 +67,13 @@ public class LoginServicesImpl implements LoginServices {
         //Se firma el String aleatorio
         byte[] signature;
         try {
-            Signature sign = Signature.getInstance("SHA256withRSA");
+            Signature sign = Signature.getInstance(Constantes.SHA_256_WITH_RSA);
             sign.initSign(privateKey);
             sign.update(randomString.getBytes());
             signature = sign.sign();
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             log.error(e.getMessage(), e);
-            return Single.just(Either.left("Error al firmar el String aleatorio"));
+            return Single.just(Either.left(Constantes.ERROR_AL_FIRMAR_EL_STRING_ALEATORIO));
         }
 
         //Se codifica en Base64
@@ -82,11 +83,11 @@ public class LoginServicesImpl implements LoginServices {
 
         //Se envía el String aleatorio y la firma codificada en base64 al servidor
         //para que valide la firma y devuelva el token
-        String authorization = "Certificate " +
+        String authorization = Constantes.CERTIFICATE +
                 usernameBase64 +
-                ":" +
+                Constantes.SEPARATOR +
                 randomStringBase64 +
-                ":" +
+                Constantes.SEPARATOR +
                 signatureBase64;
         cache.setCertificateAuth(authorization);
         return loginDAO.login(authorization);

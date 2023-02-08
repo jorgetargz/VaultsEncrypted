@@ -91,7 +91,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException |
                  BadPaddingException e) {
             log.error(e.getMessage(), e);
-            throw new ValidationException("Error al desencriptar la contraseña con la clave privada del servidor");
+            throw new ValidationException(Constantes.ERROR_AL_DESENCRIPTAR_LA_CLAVE_CON_LA_CLAVE_PRIVADA_DEL_SERVIDOR);
         }
 
         //Se desencripta la clave pública con la contraseña
@@ -104,16 +104,16 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         X509EncodedKeySpec x509Spec = new X509EncodedKeySpec(publicKeyBytes);
         PublicKey publicKey;
         try {
-            publicKey = KeyFactory.getInstance("RSA").generatePublic(x509Spec);
+            publicKey = KeyFactory.getInstance(Constantes.RSA).generatePublic(x509Spec);
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             log.error(e.getMessage(), e);
-            throw new ValidationException("Error al crear la clave pública");
+            throw new ValidationException(Constantes.ERROR_AL_CREAR_LA_CLAVE_PUB);
         }
 
         //Se crea un certificado con la clave pública del usuario firmado con la clave privada del servidor
         //Se crea un certificado firmado con la clave pública
-        X500Name nombre = new X500Name("CN=" + user.getUsername());
-        X500Name issuer = new X500Name("CN=SERVER");
+        X500Name nombre = new X500Name(Constantes.CN + user.getUsername());
+        X500Name issuer = new X500Name(Constantes.CN_SERVER);
         X509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(
                 issuer, //issuer
                 BigInteger.valueOf(1), //serial number
@@ -126,10 +126,10 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         //Se firma el certificado con la clave privada
         ContentSigner signer;
         try {
-            signer = new JcaContentSignerBuilder("SHA1WithRSAEncryption").build(keyPair.getPrivate());
+            signer = new JcaContentSignerBuilder(Constantes.SHA_1_WITH_RSA_ENCRYPTION).build(keyPair.getPrivate());
         } catch (OperatorCreationException e) {
             log.error(e.getMessage(), e);
-            throw new ValidationException("Error al firmar el certificado");
+            throw new ValidationException(Constantes.ERROR_AL_FIRMAR_EL_CERTIFICADO);
         }
 
         //Se obtiene el certificado
@@ -138,7 +138,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
             certificate = new JcaX509CertificateConverter().getCertificate(certBuilder.build(signer));
         } catch (CertificateException e) {
             log.error(e.getMessage(), e);
-            throw new ValidationException("Error al obtener el certificado");
+            throw new ValidationException(Constantes.ERROR_AL_OBTENER_EL_CERTIFICADO);
         }
 
         //Pasar el certificado a base64
@@ -146,7 +146,7 @@ public class ServicesUsersImpl implements ServicesUsers, Serializable {
         try {
             certificadoBase64 = Base64.getUrlEncoder().encodeToString(certificate.getEncoded());
         } catch (CertificateEncodingException e) {
-            throw new ValidationException("Error al codificar el certificado a base64");
+            throw new ValidationException(Constantes.ERROR_AL_CODIFICAR_EL_CERTIFICADO_A_BASE_64);
         }
 
         //Se guarda el certificado en base64 en el usuario para que se guarde en la base de datos
