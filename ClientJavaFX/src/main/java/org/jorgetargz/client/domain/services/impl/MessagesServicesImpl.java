@@ -102,24 +102,22 @@ public class MessagesServicesImpl implements MessagesServices {
     private void verifySignature(Message message) {
         String usernameBase64 = Base64.getUrlEncoder().encodeToString(message.getSignedBy().getBytes());
         CompletableFuture<User> userCompletableFuture = new CompletableFuture<>();
-        User user = null;
-        try {
-            usersDAO.get(usernameBase64)
-                    .subscribe(eitherUser -> {
-                        if (eitherUser.isLeft()) {
-                            userCompletableFuture.completeExceptionally(
-                                    new RuntimeException(eitherUser.getLeft())
-                            );
-                            log.error(eitherUser.getLeft());
-                        } else {
-                            userCompletableFuture.complete(eitherUser.get());
-                        }
-                    });
-            user = userCompletableFuture.join();
-        } catch (RuntimeException e) {
-            log.error(e.getMessage(), e);
+        User user;
+        usersDAO.get(usernameBase64)
+                .subscribe(eitherUser -> {
+                    if (eitherUser.isLeft()) {
+                        userCompletableFuture.complete(null);
+                        log.error(eitherUser.getLeft());
+                    } else {
+                        userCompletableFuture.complete(eitherUser.get());
+                    }
+                });
+        user = userCompletableFuture.join();
+
+        if (user == null) {
+            message.setSignedBy(Constantes.COULDN_T_VERIFY);
+            return;
         }
-        if (user == null) return;
 
         String certificateBase64 = user.getCertificate();
         X509Certificate certificate = X509CertUtils.parse(Base64.getUrlDecoder().decode(certificateBase64));
@@ -132,7 +130,7 @@ public class MessagesServicesImpl implements MessagesServices {
         try {
             signUtils.verifySign(publicKey, signature, message.getContentCiphedAES().getCipherText().getBytes());
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            throw new RuntimeException(Constantes.COULDN_T_VERIFY_SIGNATURE);
+            message.setSignedBy(Constantes.COULDN_T_VERIFY);
         }
     }
 }
