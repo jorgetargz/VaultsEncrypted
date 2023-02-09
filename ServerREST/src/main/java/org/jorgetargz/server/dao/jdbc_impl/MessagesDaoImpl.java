@@ -61,6 +61,8 @@ public class MessagesDaoImpl implements MessagesDao {
                 Message message = Message.builder()
                         .id(resultSet.getInt(Constantes.ID))
                         .idVault(vaultId)
+                        .signature(resultSet.getString("signature"))
+                        .signedBy(resultSet.getString("signedBy"))
                         .contentCiphedAES(ContentCiphedAES.builder()
                                 .iv(resultSet.getString(Constantes.IV))
                                 .salt(resultSet.getString(Constantes.SALT))
@@ -85,12 +87,17 @@ public class MessagesDaoImpl implements MessagesDao {
             preparedStatementInsertMessage.setString(2, message.getContentCiphedAES().getIv());
             preparedStatementInsertMessage.setString(3, message.getContentCiphedAES().getSalt());
             preparedStatementInsertMessage.setString(4, message.getContentCiphedAES().getCipherText());
+            preparedStatementInsertMessage.setString(5, message.getSignedBy());
+            preparedStatementInsertMessage.setString(6, message.getSignature());
+
             preparedStatementInsertMessage.executeUpdate();
             ResultSet resultSetMessage = preparedStatementInsertMessage.getGeneratedKeys();
             if (resultSetMessage.next()) {
                 return Message.builder()
                         .id(resultSetMessage.getInt(1))
                         .idVault(vaultId)
+                        .signedBy(message.getSignedBy())
+                        .signature(message.getSignature())
                         .contentCiphedAES(message.getContentCiphedAES())
                         .build();
             } else {
@@ -111,11 +118,15 @@ public class MessagesDaoImpl implements MessagesDao {
             preparedStatementUpdateMessage.setString(1, message.getContentCiphedAES().getIv());
             preparedStatementUpdateMessage.setString(2, message.getContentCiphedAES().getSalt());
             preparedStatementUpdateMessage.setString(3, message.getContentCiphedAES().getCipherText());
-            preparedStatementUpdateMessage.setInt(4, message.getId());
+            preparedStatementUpdateMessage.setString(4, message.getSignedBy());
+            preparedStatementUpdateMessage.setString(5, message.getSignature());
+            preparedStatementUpdateMessage.setInt(6, message.getId());
             if (preparedStatementUpdateMessage.executeUpdate() == 1) {
                 return Message.builder()
                         .id(message.getId())
                         .contentCiphedAES(message.getContentCiphedAES())
+                        .signedBy(message.getSignedBy())
+                        .signature(message.getSignature())
                         .build();
             } else {
                 throw new NotFoundException(Constantes.MESSAGE_NOT_FOUND);

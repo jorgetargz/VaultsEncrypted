@@ -50,8 +50,12 @@ module ClientJavaFX {
     exports org.jorgetargz.client.gui.screens.vault_management;
     exports org.jorgetargz.client.gui.screens.vault;
 
+    exports org.jorgetargz.client.utils;
+
     opens config;
     opens org.jorgetargz.client.dao.common;
+    opens org.jorgetargz.client.domain.common;
+    opens org.jorgetargz.client.gui.screens.vault;
 
     opens org.jorgetargz.client.gui.main;
     opens org.jorgetargz.client.gui.main.common;
@@ -61,6 +65,5 @@ module ClientJavaFX {
     opens org.jorgetargz.client.gui.screens.welcome;
     opens org.jorgetargz.client.gui.screens.users_management;
     opens org.jorgetargz.client.gui.screens.vault_management;
-    opens org.jorgetargz.client.gui.screens.vault;
 
 }

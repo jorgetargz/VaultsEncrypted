@@ -30,14 +30,19 @@ public class VaultsViewModel {
 
     public void loadMessages(Vault credentials) {
         state.set(new VaultState(null, null, false, true, false));
-        messageServices.getAll(credentials.getName(), credentials.getUsernameOwner(), credentials.getKey())
-                .subscribeOn(Schedulers.single())
-                .subscribe(either -> {
-                    if (either.isLeft())
-                        state.set(new VaultState(either.getLeft(), null, false, false, true));
-                    else
-                        state.set(new VaultState(null, either.get(), false, false, true));
-                });
+        try {
+            messageServices.getAll(credentials.getName(), credentials.getUsernameOwner(), credentials.getKey())
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(either -> {
+                        if (either.isLeft())
+                            state.set(new VaultState(either.getLeft(), null, false, false, true));
+                        else
+                            state.set(new VaultState(null, either.get(), false, false, true));
+                    });
+        } catch (RuntimeException e){
+            state.set(new VaultState(e.getMessage(), null, false, false, true));
+        }
+
     }
 
     public void saveMessage(Vault vault, String content) {

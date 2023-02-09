@@ -14,8 +14,8 @@ public class SQLQueries {
     public static final String DELETE_VAULTS_QUERY_BY_USERNAME = "DELETE FROM vaults WHERE username = ?";
 
     public static final String SELECT_MESSAGES_QUERY = "SELECT * FROM messages WHERE vaultId = ?";
-    public static final String INSERT_MESSAGE_QUERY = "INSERT INTO messages (vaultId, iv, salt, cipherText) VALUES (?, ?, ?, ?)";
-    public static final String UPDATE_MESSAGE_QUERY = "UPDATE messages SET iv = ?, salt = ?, cipherText = ? WHERE id = ?";
+    public static final String INSERT_MESSAGE_QUERY = "INSERT INTO messages (vaultId, iv, salt, cipherText, signedBy, signature) VALUES (?, ?, ?, ?, ?, ?)";
+    public static final String UPDATE_MESSAGE_QUERY = "UPDATE messages SET iv = ?, salt = ?, cipherText = ?, signedBy = ?, signature = ? WHERE id = ?";
     public static final String DELETE_MESSAGE_QUERY = "DELETE FROM messages WHERE id = ?";
     public static final String SELECT_VAULT_BY_MESSAGE_ID = "SELECT * FROM vaults WHERE id IN (SELECT vaultId FROM messages WHERE id = ?)";
     public static final String DELETE_MESSAGES_QUERY = "DELETE FROM messages WHERE vaultId = ?";

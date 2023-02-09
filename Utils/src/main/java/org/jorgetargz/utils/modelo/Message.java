@@ -12,6 +12,8 @@ public class Message {
     private int idVault;
     private ContentCiphedAES contentCiphedAES;
     private String contentUnsecured;
+    private String signedBy;
+    private String signature;
 
     @Override
     public String toString() {

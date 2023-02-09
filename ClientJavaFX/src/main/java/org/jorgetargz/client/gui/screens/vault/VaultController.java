@@ -34,6 +34,8 @@ public class VaultController extends BaseScreenController {
     private TableColumn<Message, Integer> columnId;
     @FXML
     private TableColumn<Message, String> columnContent;
+    @FXML
+    private TableColumn<Message, String> columnSignedBy;
 
     @Inject
     public VaultController(VaultsViewModel vaultsViewModel) {
@@ -44,6 +46,7 @@ public class VaultController extends BaseScreenController {
 
         columnId.setCellValueFactory(new PropertyValueFactory<>(ScreenConstants.ID));
         columnContent.setCellValueFactory(new PropertyValueFactory<>(ScreenConstants.CONTENT_UNSECURED));
+        columnSignedBy.setCellValueFactory(new PropertyValueFactory<>(ScreenConstants.SIGNED_BY));
         vaultsViewModel.getState().addListener((observableValue, oldState, newState) -> {
             if (newState.error() != null) {
                 Platform.runLater(() -> {
@@ -96,7 +99,7 @@ public class VaultController extends BaseScreenController {
     @FXML
     private void updateMessageField() {
         Message message = tableMessages.getSelectionModel().getSelectedItem();
-        txtMessageUpdate.setText(message.getContentUnsecured());
+        if (message != null) txtMessageUpdate.setText(message.getContentUnsecured());
     }
 
 

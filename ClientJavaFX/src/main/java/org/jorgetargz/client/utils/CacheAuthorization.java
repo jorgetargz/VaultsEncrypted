@@ -1,7 +1,9 @@
-package org.jorgetargz.client.dao.vault_api.utils;
+package org.jorgetargz.client.utils;
 
 import jakarta.inject.Singleton;
 import lombok.Data;
+
+import java.security.PrivateKey;
 
 
 @Data
@@ -12,4 +14,5 @@ public class CacheAuthorization {
     private String password;
     private String jwtAuth;
     private String certificateAuth;
+    private PrivateKey privateKey;
 }
