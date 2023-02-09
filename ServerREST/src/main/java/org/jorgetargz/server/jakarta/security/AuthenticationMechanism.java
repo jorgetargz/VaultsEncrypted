@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.HttpHeaders;
 import lombok.extern.log4j.Log4j2;
+import org.jorgetargz.security.SignUtils;
 import org.jorgetargz.server.dao.excepciones.DatabaseException;
 import org.jorgetargz.server.dao.excepciones.NotFoundException;
 import org.jorgetargz.server.dao.excepciones.UnauthorizedException;
@@ -41,12 +42,14 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
     private final KeyPair keyPair;
     private final JWTBlackList jwtBlackList;
     private final ServicesUsers servicesUsers;
+    private final SignUtils signUtils;
 
     @Inject
-    public AuthenticationMechanism(KeyPair keyPair, JWTBlackList jwtBlackList, ServicesUsers servicesUsers) {
+    public AuthenticationMechanism(KeyPair keyPair, JWTBlackList jwtBlackList, ServicesUsers servicesUsers, SignUtils signUtils) {
         this.keyPair = keyPair;
         this.jwtBlackList = jwtBlackList;
         this.servicesUsers = servicesUsers;
+        this.signUtils = signUtils;
     }
 
     @Override
@@ -102,10 +105,7 @@ public class AuthenticationMechanism implements HttpAuthenticationMechanism {
         PublicKey publicKey = certificate.getPublicKey();
         // Se comprueba la firma del randomString con la clave pública del certificado
         try {
-            Signature sign = Signature.getInstance(Constantes.SHA_256_WITH_RSA);
-            sign.initVerify(publicKey);
-            sign.update(randomString);
-            if (!sign.verify(signature)) {
+            if (!signUtils.verifySign(publicKey, signature, randomString)) {
                 return CredentialValidationResult.INVALID_RESULT;
             }
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {

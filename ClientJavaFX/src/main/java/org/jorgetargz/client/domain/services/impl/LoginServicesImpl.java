@@ -6,10 +6,11 @@ import jakarta.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jorgetargz.client.dao.LoginDAO;
-import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
+import org.jorgetargz.client.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.common.Constantes;
 import org.jorgetargz.client.domain.services.LoginServices;
 import org.jorgetargz.security.KeyStoreUtils;
+import org.jorgetargz.security.SignUtils;
 import org.jorgetargz.utils.modelo.User;
 
 import java.io.IOException;
@@ -26,12 +27,14 @@ public class LoginServicesImpl implements LoginServices {
     private final LoginDAO loginDAO;
     private final CacheAuthorization cache;
     private final KeyStoreUtils keyStoreUtils;
+    private final SignUtils signUtils;
 
     @Inject
-    public LoginServicesImpl(LoginDAO loginDAO, CacheAuthorization cache, KeyStoreUtils keyStoreUtils) {
+    public LoginServicesImpl(LoginDAO loginDAO, CacheAuthorization cache, KeyStoreUtils keyStoreUtils, SignUtils signUtils) {
         this.loginDAO = loginDAO;
         this.cache = cache;
         this.keyStoreUtils = keyStoreUtils;
+        this.signUtils = signUtils;
     }
 
     @Override
@@ -60,17 +63,15 @@ public class LoginServicesImpl implements LoginServices {
             log.error(e.getMessage(), e);
             return Single.just(Either.left(Constantes.ERROR_AL_OBTENER_LA_CLAVE_PRIVADA_DEL_KEY_STORE));
         }
+        cache.setPrivateKey(privateKey);
 
         //Se genera un String aleatorio
-        String randomString = RandomStringUtils.randomAlphanumeric(20);
+        String randomString = RandomStringUtils.randomAlphanumeric(Constantes.STRING_FOR_LOGIN_SIGNATURE_PROCESS_SIZE);
 
         //Se firma el String aleatorio
         byte[] signature;
         try {
-            Signature sign = Signature.getInstance(Constantes.SHA_256_WITH_RSA);
-            sign.initSign(privateKey);
-            sign.update(randomString.getBytes());
-            signature = sign.sign();
+            signature = signUtils.sign(privateKey, randomString.getBytes());
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             log.error(e.getMessage(), e);
             return Single.just(Either.left(Constantes.ERROR_AL_FIRMAR_EL_STRING_ALEATORIO));
@@ -89,7 +90,9 @@ public class LoginServicesImpl implements LoginServices {
                 randomStringBase64 +
                 Constantes.SEPARATOR +
                 signatureBase64;
+
         cache.setCertificateAuth(authorization);
+
         return loginDAO.login(authorization);
     }
 
@@ -100,6 +103,7 @@ public class LoginServicesImpl implements LoginServices {
         cache.setPassword(null);
         cache.setJwtAuth(null);
         cache.setCertificateAuth(null);
+        cache.setPrivateKey(null);
         return loginDAO.logout(jwtAuth);
     }
 }
