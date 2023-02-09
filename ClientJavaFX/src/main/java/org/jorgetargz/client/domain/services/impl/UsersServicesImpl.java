@@ -74,7 +74,7 @@ public class UsersServicesImpl implements UsersServices {
         X509EncodedKeySpec x509Spec = new X509EncodedKeySpec(clavePublicaCliente.getEncoded());
 
         //Generar una clave aleatoria
-        String password = RandomStringUtils.randomAlphanumeric(Constantes.RANDOM_STRING_SIZE);
+        String password = RandomStringUtils.randomAlphanumeric(Constantes.PASS_FOR_ENC_PUB_KEY_SIZE);
 
         //Se obtiene la clave pública del cliente en formato Base64
         String clavePublicaClienteBase64 = Base64.getUrlEncoder().encodeToString(x509Spec.getEncoded());

@@ -3,8 +3,8 @@ package org.jorgetargz.client.domain.common;
 public class Constantes {
 
     public static final int KEY_SIZE = 2048;
-    public static final int RANDOM_STRING_SIZE = 16;
-    public static final String SHA_256_WITH_RSA = "SHA256withRSA";
+    public static final int PASS_FOR_ENC_PUB_KEY_SIZE = 16;
+    public static final int STRING_FOR_LOGIN_SIGNATURE_PROCESS_SIZE = 20;
 
     public static final String SERVER_PUBLIC_KEY = "serverPublicKey";
     public static final String KEY_STORE_PFX = "KeyStore.pfx";
@@ -34,6 +34,7 @@ public class Constantes {
     public static final String ERROR_AL_ENCRIPTAR_LA_CLAVE_DEL_VAULT_CON_LA_CLAVE_PUBLICA_DEL_USUARIO_A_COMPARTIR = "Error al encriptar la clave del vault con la clave publica del usuario a compartir";
     public static final String RSA = "RSA";
     public static final String ERROR_AL_OBTENER_LA_CLAVE_PUB_DEL_SERVIDOR = "Error al obtener la clave pública del servidor";
+    public static final String COULDN_T_VERIFY_SIGNATURE = "Couldn't verify signature";
 
     private Constantes() {
     }
