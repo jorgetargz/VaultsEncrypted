@@ -5,7 +5,7 @@ import jakarta.inject.Inject;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
+import org.jorgetargz.client.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.services.LoginServices;
 import org.jorgetargz.client.gui.screens.common.ScreenConstants;
 

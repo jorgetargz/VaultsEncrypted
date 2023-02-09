@@ -5,6 +5,7 @@ import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jorgetargz.client.dao.common.Constantes;
+import org.jorgetargz.client.utils.CacheAuthorization;
 
 import java.io.IOException;
 

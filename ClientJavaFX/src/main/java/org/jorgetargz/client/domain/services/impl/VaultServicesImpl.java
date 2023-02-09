@@ -7,7 +7,7 @@ import jakarta.inject.Inject;
 import lombok.extern.log4j.Log4j2;
 import org.jorgetargz.client.dao.UsersDAO;
 import org.jorgetargz.client.dao.VaultDAO;
-import org.jorgetargz.client.dao.vault_api.utils.CacheAuthorization;
+import org.jorgetargz.client.utils.CacheAuthorization;
 import org.jorgetargz.client.domain.common.Constantes;
 import org.jorgetargz.client.domain.services.VaultServices;
 import org.jorgetargz.security.EncriptacionRSA;
